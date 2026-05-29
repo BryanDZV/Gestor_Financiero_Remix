@@ -44,6 +44,29 @@ npm run build
 
 ## Deployment
 
+### Branch Strategy and CI/CD
+
+This repository uses two long-lived branches:
+
+- `develop`: integration branch. Pushes here deploy preview builds to Vercel.
+- `main`: production branch. Pushes here deploy production builds to Vercel.
+
+GitHub Actions workflows live in [`.github/workflows`](.github/workflows) and currently do three things:
+
+- `ci.yml`: runs on pull requests and pushes to `develop`/`main`, then executes `npm run typecheck` and `npm run build`.
+- `deploy-preview.yml`: runs on pushes to `develop` and deploys a preview using the Vercel CLI.
+- `deploy-production.yml`: runs on pushes to `main` and deploys production using the Vercel CLI.
+
+Required GitHub secrets for deployment:
+
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+
+For Vercel deployments, the project uses the official React Router preset via `@vercel/react-router` in `react-router.config.ts`.
+
 ### Docker Deployment
 
 To build and run using Docker:

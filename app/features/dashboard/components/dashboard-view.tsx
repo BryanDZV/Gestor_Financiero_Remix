@@ -1,0 +1,155 @@
+import { useState, useMemo } from "react";
+import { Icon } from "@iconify/react";
+import { DashboardLayout } from "~/components/layout/dashboard-layout";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { formatMoney, formatDate } from "~/lib/utils";
+import { Button } from "~/components/ui/button";
+import { TransactionAmount } from "~/components/ui/transaction-amount";
+import type { DashboardViewProps } from "~/types";
+
+export function DashboardView({ userEmail, wallets, transactions }: DashboardViewProps) {
+  const [showTransactions, setShowTransactions] = useState(false);
+
+  // Calculamos el patrimonio separado por moneda USE MEMO
+  const totalsByCurrency = useMemo(() => {
+    const totals: Record<string, { assets: number, liabilities: number, netWorth: number }> = {};
+    
+    wallets.forEach(w => {
+      const c = w.currency || 'EUR';
+      if (!totals[c]) totals[c] = { assets: 0, liabilities: 0, netWorth: 0 };
+      
+      if (w.is_liability) totals[c].liabilities += w.current_balance;
+      else totals[c].assets += w.current_balance;
+      
+      totals[c].netWorth = totals[c].assets - totals[c].liabilities;
+    });
+    
+    const results = Object.entries(totals).map(([currency, data]) => ({ currency, ...data }));
+    return results.length > 0 ? results : [{ currency: 'EUR', assets: 0, liabilities: 0, netWorth: 0 }];
+  }, [wallets]);
+
+  return (
+    <DashboardLayout userEmail={userEmail}>
+      <div className="mx-auto max-w-6xl space-y-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <header className="border-b border-slate-200 pb-6">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Resumen General</h1>
+          <p className="mt-2 text-sm text-slate-500">Un vistazo rápido a tu estado financiero sincronizado.</p>
+        </header>
+
+        {/* TARJETAS DE PATRIMONIO POR MONEDA */}
+        <div className="space-y-8">
+          {totalsByCurrency.map(({ currency, assets, liabilities, netWorth }) => (
+            <div key={currency} className="space-y-4">
+              {totalsByCurrency.length > 1 && (
+                <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-500 border-b border-slate-200 pb-2">
+                  Patrimonio en {currency}
+                </h2>
+              )}
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                <Card className="bg-slate-900 text-white shadow-md border-0">
+                  <CardContent className="p-6">
+                    <p className="text-sm font-medium text-slate-400 uppercase tracking-widest">Patrimonio Neto</p>
+                    <p className="mt-2 text-4xl font-bold tracking-tight">{formatMoney(netWorth, currency)}</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-emerald-50 border-emerald-100">
+                  <CardContent className="p-6">
+                    <p className="text-sm font-medium text-emerald-700 uppercase tracking-widest flex items-center">
+                      <Icon icon="ph:wallet" className="mr-2 size-4" /> Liquidez Total
+                    </p>
+                    <p className="mt-2 text-3xl font-bold tracking-tight text-emerald-900">{formatMoney(assets, currency)}</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-red-50 border-red-100">
+                  <CardContent className="p-6">
+                    <p className="text-sm font-medium text-red-700 uppercase tracking-widest flex items-center">
+                      <Icon icon="ph:credit-card" className="mr-2 size-4" /> Deuda Total
+                    </p>
+                    <p className="mt-2 text-3xl font-bold tracking-tight text-red-900">{formatMoney(liabilities, currency)}</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* LISTADO DE CUENTAS RAPIDO */}
+        <div className="space-y-4 pt-4 border-t border-slate-200">
+          <h2 className="text-lg font-semibold tracking-tight text-slate-900">Tus Cuentas</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {wallets.map(w => (
+              <Card key={w.id} className="hover:border-slate-300 transition-colors">
+                <CardContent className="p-5">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-semibold text-slate-900 line-clamp-1">{w.name}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">{w.is_liability ? 'Pasivo / Deuda' : 'Activo / Liquidez'}</p>
+                    </div>
+                    <Icon icon={w.is_liability ? "ph:credit-card-duotone" : "ph:wallet-duotone"} className={`size-6 shrink-0 ${w.is_liability ? 'text-red-500' : 'text-emerald-500'}`} />
+                  </div>
+                  <p className="mt-4 text-2xl font-bold tracking-tight text-slate-800">{formatMoney(w.current_balance, w.currency)}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* ACORDEÓN DE ÚLTIMOS MOVIMIENTOS */}
+        <div className="pt-6 border-t border-slate-200">
+          <Button 
+            variant="outline" 
+            onClick={() => setShowTransactions(!showTransactions)}
+            className="w-full sm:w-auto flex items-center gap-2 rounded-xl text-slate-600 hover:text-slate-900 bg-white"
+          >
+            <Icon icon="ph:clock-counter-clockwise" className="size-4" />
+            {showTransactions ? "Ocultar últimos movimientos" : "Ver últimos movimientos"}
+            <Icon icon={showTransactions ? "ph:caret-up" : "ph:caret-down"} className="size-4 ml-1" />
+          </Button>
+
+          {showTransactions && (
+            <Card className="mt-4 animate-in fade-in slide-in-from-top-2 border-slate-200">
+              <CardHeader className="pb-3 border-b border-slate-100 bg-slate-50/50">
+                <CardTitle className="text-base flex items-center gap-2 text-slate-700">
+                  <Icon icon="ph:list-dashes" className="size-5" /> Historial Reciente (Top 10)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                {transactions.length === 0 ? (
+                  <div className="p-6 text-center text-sm text-slate-500">No hay movimientos recientes registrados en ninguna de tus cuentas.</div>
+                ) : (
+                  <ul className="divide-y divide-slate-100">
+                    {transactions.map(tx => (
+                      <li key={tx.id} className="flex flex-col gap-2 p-4 hover:bg-slate-50 transition-colors sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-slate-900">{tx.concept}</p>
+                          <div className="flex items-center flex-wrap gap-2 mt-1 text-xs text-slate-500">
+                            <span className="flex items-center">
+                              <Icon icon="ph:calendar-blank" className="mr-1 size-3.5" />
+                              {formatDate(tx.date)}
+                            </span>
+                            {tx.wallets?.name && (
+                              <>
+                                <span className="w-1 h-1 rounded-full bg-slate-300 hidden sm:block"></span>
+                                <span className="flex items-center font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
+                                  <Icon icon="ph:wallet" className="mr-1 size-3.5"/> 
+                                  {tx.wallets.name}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <TransactionAmount amount={tx.amount} type={tx.type} currency={tx.wallets?.currency} className="text-sm text-left sm:text-right" />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+}

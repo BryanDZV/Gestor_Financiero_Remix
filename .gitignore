@@ -5,3 +5,6 @@
 # React Router
 /.react-router/
 /build/
+ARCHITECTURE.md
+CONTEXTO_PROYECTO.md
+GUIA_ARQUITECTURA_REMIX.md
