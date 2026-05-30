@@ -80,6 +80,7 @@ export type Budget = {
   name: string;
   monthly_limit: number;
   spent: number;
+  currency?: string;
 };
 
 export type Subscription = {
@@ -102,7 +103,8 @@ export interface AccountDetailViewProps {
   wallet: WalletViewModel;
   cycles: CycleViewModel[];
   categories: { id: string; name: string }[];
-  otherWallets: { id: string; name: string }[];
+  otherWallets: { id: string; name: string; currency?: string }[];
+  rates?: Record<string, number>;
   actionData?: any;
   actionError?: string;
   isSubmitting: boolean;
@@ -113,7 +115,9 @@ export interface CycleManagerProps {
   isSubmitting: boolean;
   shareDivisor?: number;
   categories?: { id: string; name: string }[];
-  otherWallets: { id: string; name: string }[];
+  otherWallets: { id: string; name: string; currency?: string }[];
+  rates?: Record<string, number>;
+  currentCurrency?: string;
 }
 
 export interface AccountsViewProps {
@@ -124,6 +128,7 @@ export interface AccountsViewProps {
 export interface BudgetsViewProps {
   userEmail: string;
   budgets: Budget[];
+  currencyOptions?: string[];
 }
 
 export interface SubscriptionsViewProps {
@@ -140,6 +145,7 @@ export interface DashboardViewProps {
 
 export interface DebtPlannerViewProps {
   userEmail: string;
+  currencyOptions?: string[];
 }
 
 export interface AccountHeaderProps {
