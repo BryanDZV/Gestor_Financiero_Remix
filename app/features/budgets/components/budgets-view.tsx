@@ -10,9 +10,10 @@ import { PageHeader } from "~/components/ui/page-header";
 import { FormError } from "~/components/ui/form-error";
 import { EmptyState } from "~/components/ui/empty-state";
 import { Input } from "~/components/ui/input";
+import { SelectNative } from "~/components/ui/select-native";
 import type { BudgetsViewProps } from "~/types";
 
-export function BudgetsView({ userEmail, budgets }: BudgetsViewProps) {
+export function BudgetsView({ userEmail, budgets, currencyOptions = ["EUR", "USD", "GBP", "MXN"] }: BudgetsViewProps) {
   const navigation = useNavigation();
   const submit = useSubmit();
   const actionData = useActionData<{ error?: string; success?: boolean }>();
@@ -74,6 +75,21 @@ export function BudgetsView({ userEmail, budgets }: BudgetsViewProps) {
                     <label className="text-xs font-medium text-slate-500">Límite mensual (0 = Sin límite)</label>
                     <Input type="number" step="0.01" name="monthly_limit" defaultValue={0} min={0} required className="tabular-nums" />
                   </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-slate-500">Moneda</label>
+                    <SelectNative name="currency" defaultValue="EUR">
+                      {currencyOptions.map(code => {
+                        let label = code;
+                        try {
+                          const name = new Intl.DisplayNames(['es-ES'], { type: 'currency' }).of(code);
+                          if (name) label = `${code} - ${name.charAt(0).toUpperCase() + name.slice(1)}`;
+                        } catch (e) {
+                          // Ignorar si el navegador no lo soporta
+                        }
+                        return <option key={code} value={code}>{label}</option>;
+                      })}
+                    </SelectNative>
+                  </div>
                   <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-xl bg-blue-600 text-white shadow-sm hover:bg-blue-700">
                     {isSubmitting ? "Guardando..." : "Crear presupuesto"}
                   </Button>
@@ -116,13 +132,13 @@ export function BudgetsView({ userEmail, budgets }: BudgetsViewProps) {
                       <CardTitle className="text-base truncate pr-6">{budget.name}</CardTitle>
                       {hasLimit ? (
                         <div className="flex items-baseline gap-1 mt-1">
-                          <span className={`text-xl font-bold tabular-nums tracking-tight ${textColor}`}>{formatMoney(budget.spent)}</span>
-                          <span className="text-sm font-medium text-slate-500 tabular-nums">/ {formatMoney(budget.monthly_limit)}</span>
+                          <span className={`text-xl font-bold tabular-nums tracking-tight ${textColor}`}>{formatMoney(budget.spent, budget.currency || "EUR")}</span>
+                          <span className="text-sm font-medium text-slate-500 tabular-nums">/ {formatMoney(budget.monthly_limit, budget.currency || "EUR")}</span>
                         </div>
                       ) : (
                         <div className="flex flex-col mt-1">
                           <span className="text-xs font-medium uppercase tracking-wider text-slate-400 mb-1">Gastado este mes</span>
-                          <span className="text-xl font-bold tabular-nums tracking-tight text-slate-700">{formatMoney(budget.spent)}</span>
+                          <span className="text-xl font-bold tabular-nums tracking-tight text-slate-700">{formatMoney(budget.spent, budget.currency || "EUR")}</span>
                         </div>
                       )}
                     </CardHeader>

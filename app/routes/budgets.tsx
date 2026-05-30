@@ -28,7 +28,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return { ...cat, spent };
   });
 
-  return data({ user, budgets }, { headers });
+  // Obtenemos todas las monedas disponibles en la API
+  let currencyOptions: string[] = ["EUR", "USD", "GBP", "MXN"];
+  try {
+    const res = await fetch("https://open.er-api.com/v6/latest/EUR");
+    if (res.ok) {
+      const apiData = await res.json();
+      if (apiData.rates) currencyOptions = Object.keys(apiData.rates);
+    }
+  } catch (e) {
+    console.error("Error al obtener opciones de moneda:", e);
+  }
+
+  return data({ user, budgets, currencyOptions }, { headers });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -45,6 +57,7 @@ export async function action({ request }: ActionFunctionArgs) {
       name: formData.get("name"),
       type: 'expense',
       monthly_limit: parseFloat(formData.get("monthly_limit") as string) || 0,
+      currency: formData.get("currency") as string || 'EUR',
     });
     if (error) {
       console.error("Error al crear presupuesto:", error);
@@ -65,6 +78,6 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function BudgetsRoute() {
-  const { user, budgets } = useLoaderData<typeof loader>();
-  return <BudgetsView userEmail={user.email || ""} budgets={budgets} />;
+  const { user, budgets, currencyOptions } = useLoaderData<typeof loader>();
+  return <BudgetsView userEmail={user.email || ""} budgets={budgets} currencyOptions={currencyOptions} />;
 }
