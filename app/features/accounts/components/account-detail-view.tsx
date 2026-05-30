@@ -16,6 +16,7 @@ export function AccountDetailView({
   cycles,
   categories,
   otherWallets,
+  rates,
   actionData,
   actionError,
   isSubmitting,
@@ -43,11 +44,16 @@ export function AccountDetailView({
   }, [cycles, wallet.initial_balance, wallet.is_liability]);
 
   useEffect(() => {
-    if (!isSubmitting && actionData?.success && actionData?.intent === "add_transaction") {
-      if (actionData.warning) {
-        toast.warning(actionData.warning, { duration: 8000 });
-      } else {
-        toast.success("Movimiento registrado correctamente");
+    if (!isSubmitting && actionData?.success) {
+      if (actionData.intent === "add_transaction") {
+        if (actionData.warning) {
+          toast.warning(actionData.warning, { duration: 8000 });
+        } else {
+          toast.success("Movimiento registrado correctamente");
+        }
+      }
+      if (actionData.intent === "import_csv") {
+        toast.success(`¡Éxito! Se han importado ${actionData.count} movimientos correctamente.`);
       }
     }
   }, [isSubmitting, actionData]);
@@ -74,7 +80,15 @@ export function AccountDetailView({
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-1">
-            <CycleManager activeCycles={activeCycles} isSubmitting={isSubmitting} shareDivisor={wallet.share_divisor} categories={categories} otherWallets={otherWallets} />
+            <CycleManager 
+              activeCycles={activeCycles} 
+              isSubmitting={isSubmitting} 
+              shareDivisor={wallet.share_divisor} 
+              categories={categories} 
+              otherWallets={otherWallets}
+              rates={rates}
+              currentCurrency={wallet.currency}
+            />
           </div>
 
           <div className="lg:col-span-2">

@@ -27,10 +27,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { data: categories } = await supabase.from('categories').select('id, name').eq('user_id', user.id).order('name');
 
-  const { data: allWallets } = await supabase.from('wallets').select('id, name').eq('user_id', user.id);
+  const { data: allWallets } = await supabase.from('wallets').select('id, name, currency').eq('user_id', user.id);
   const otherWallets = (allWallets || []).filter(w => w.id !== walletId);
 
-  return { user, wallet, cycles: cycles || [], categories: categories || [], otherWallets, headers };
+  let rates: Record<string, number> = {};
+  try {
+    const res = await fetch(`https://open.er-api.com/v6/latest/${wallet.currency || 'EUR'}`);
+    if (res.ok) {
+      const apiData = await res.json();
+      rates = apiData.rates || {};
+    }
+  } catch (e) {
+    console.error("Error al obtener los tipos de cambio en el loader:", e);
+  }
+
+  return { user, wallet, cycles: cycles || [], categories: categories || [], otherWallets, rates, headers };
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -102,8 +113,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
     if (txType === "transfer") {
       const destWalletId = formData.get("destination_wallet_id") as string;
-      const { data: destWallet } = await supabase.from('wallets').select('name').eq('id', destWalletId).single();
-      const { data: sourceWallet } = await supabase.from('wallets').select('name').eq('id', walletId).single();
+      const { data: destWallet } = await supabase.from('wallets').select('name, currency').eq('id', destWalletId).single();
+      const { data: sourceWallet } = await supabase.from('wallets').select('name, currency').eq('id', walletId).single();
 
       const { error: err1 } = await supabase.from('transactions').insert({
         wallet_id: walletId,
@@ -119,12 +130,45 @@ export async function action({ request, params }: ActionFunctionArgs) {
       errorToReturn = err1;
 
       if (!err1 && destWalletId) {
-        const { data: destCycle } = await supabase.from('cycles').select('id').eq('wallet_id', destWalletId).eq('is_closed', false).order('created_at', { ascending: false }).limit(1).single();
+        // 1. Resolver el ciclo de destino (y crearlo si no existe)
+        let { data: destCycle } = await supabase.from('cycles').select('id').eq('wallet_id', destWalletId).eq('is_closed', false).order('created_at', { ascending: false }).limit(1).single();
+        let targetCycleId = destCycle?.id;
+
+        if (!targetCycleId) {
+          const txDate = new Date(date);
+          const monthName = txDate.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+          const { data: newDestCycle } = await supabase.from('cycles').insert({
+            wallet_id: destWalletId,
+            name: `Auto: ${monthName.charAt(0).toUpperCase() + monthName.slice(1)}`,
+            start_date: txDate.toISOString().split('T')[0],
+            is_closed: false
+          }).select('id').single();
+          targetCycleId = newDestCycle?.id || null;
+        }
+
+        // 2. Calcular la conversión de divisa si son diferentes
+        const sourceCurrency = sourceWallet?.currency || 'EUR';
+        const destCurrency = destWallet?.currency || 'EUR';
+        let destAmount = finalAmount;
+
+        if (sourceCurrency !== destCurrency) {
+          try {
+            const res = await fetch(`https://open.er-api.com/v6/latest/${sourceCurrency}`);
+            if (res.ok) {
+              const apiData = await res.json();
+              const rate = apiData.rates[destCurrency];
+              if (rate) destAmount = Math.round((finalAmount * rate) * 100) / 100;
+            }
+          } catch (e) {
+            console.error("Error al convertir divisa en transferencia:", e);
+          }
+        }
+
         await supabase.from('transactions').insert({
           wallet_id: destWalletId,
-          cycle_id: destCycle?.id || null,
+          cycle_id: targetCycleId,
           concept: `De ${sourceWallet?.name || 'otra cuenta'}: ${finalConcept}`,
-          amount: finalAmount,
+          amount: destAmount,
           type: 'income',
           date,
           user_id: user.id
@@ -236,11 +280,77 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return redirect(`/dashboard/cuentas/${walletId}`, { headers });
   }
 
+  if (intent === "import_csv") {
+    const file = formData.get("csv_file") as File;
+    const cycleId = formData.get("cycle_id") as string;
+    
+    if (!file || !cycleId) {
+      return data({ error: "Falta el archivo o el ciclo." }, { headers });
+    }
+
+    try {
+      const text = await file.text();
+      const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+      
+      if (lines.length < 2) return data({ error: "El archivo está vacío o no tiene encabezados." }, { headers });
+
+      // 1. Detectar inteligentemente los índices de las columnas
+      const dateIdx = parseInt(formData.get("date_idx") as string, 10);
+      const conceptIdx = parseInt(formData.get("concept_idx") as string, 10);
+      const amountIdx = parseInt(formData.get("amount_idx") as string, 10);
+
+      if (isNaN(dateIdx) || isNaN(conceptIdx) || isNaN(amountIdx)) {
+        return data({ error: "Mapeo de columnas inválido. Por favor, selecciona las columnas correctas." }, { headers });
+      }
+
+      const transactionsToInsert = [];
+      
+      // 2. Extraer datos dinámicamente ignorando columnas adicionales
+      for (let i = 1; i < lines.length; i++) {
+        // Esta expresión regular (Regex) separa por comas, pero ignora las comas dentro de comillas (Ej. "Amazon, Inc.")
+        const parts = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+        
+        // Comprobamos que la fila tenga suficientes datos para alcanzar el índice máximo que necesitamos
+        if (parts.length > Math.max(dateIdx, conceptIdx, amountIdx)) {
+          const dateStr = parts[dateIdx].trim().replace(/^"|"$/g, '');
+          const concept = parts[conceptIdx].trim().replace(/^"|"$/g, '');
+          const amountNum = parseFloat(parts[amountIdx].trim().replace(/^"|"$/g, ''));
+          
+          if (!isNaN(amountNum) && concept) {
+            let validDate;
+            try { validDate = new Date(dateStr).toISOString(); } catch(e) { validDate = new Date().toISOString(); }
+            
+            transactionsToInsert.push({
+              wallet_id: walletId,
+              cycle_id: cycleId,
+              concept: concept,
+              amount: Math.abs(amountNum),
+              type: amountNum < 0 ? 'expense' : 'income',
+              date: validDate,
+              user_id: user.id
+            });
+          }
+        }
+      }
+
+      if (transactionsToInsert.length > 0) {
+        const { error } = await supabase.from('transactions').insert(transactionsToInsert);
+        if (error) throw error;
+        return data({ success: true, intent: "import_csv", count: transactionsToInsert.length }, { headers });
+      } else {
+        return data({ error: "No se encontraron filas válidas en el CSV." }, { headers });
+      }
+    } catch (e) {
+      console.error("Error al procesar CSV:", e);
+      return data({ error: "Hubo un error al leer el archivo CSV." }, { headers });
+    }
+  }
+
   return redirect(`/dashboard/cuentas/${walletId}`, { headers });
 }
 
 export default function AccountDetailRoute() {
-  const { user, wallet, cycles, categories, otherWallets } = useLoaderData<typeof loader>();
+  const { user, wallet, cycles, categories, otherWallets, rates } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state !== "idle";
@@ -252,6 +362,7 @@ export default function AccountDetailRoute() {
       cycles={cycles}
       categories={categories}
       otherWallets={otherWallets}
+      rates={rates}
       actionData={actionData}
       actionError={actionData && "error" in actionData ? actionData.error : undefined}
       isSubmitting={isSubmitting}
