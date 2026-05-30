@@ -9,10 +9,22 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   if (error || !user) throw redirect("/login", { headers });
 
-  return data({ user }, { headers });
+  // Obtenemos todas las monedas disponibles en la API
+  let currencyOptions: string[] = ["EUR", "USD", "GBP", "MXN"];
+  try {
+    const res = await fetch("https://open.er-api.com/v6/latest/EUR");
+    if (res.ok) {
+      const apiData = await res.json();
+      if (apiData.rates) currencyOptions = Object.keys(apiData.rates);
+    }
+  } catch (e) {
+    console.error("Error al obtener opciones de moneda:", e);
+  }
+
+  return data({ user, currencyOptions }, { headers });
 }
 
 export default function DebtPlannerRoute() {
-  const { user } = useLoaderData<typeof loader>();
-  return <DebtPlannerView userEmail={user.email || ""} />;
+  const { user, currencyOptions } = useLoaderData<typeof loader>();
+  return <DebtPlannerView userEmail={user.email || ""} currencyOptions={currencyOptions} />;
 }
