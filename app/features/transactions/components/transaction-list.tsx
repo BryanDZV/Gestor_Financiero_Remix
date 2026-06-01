@@ -1,15 +1,8 @@
 import { formatDate } from "~/lib/utils";
 import { TransactionAmount } from "~/components/ui/transaction-amount";
+import type { TransactionListProps } from "~/types/components";
 
-interface Transaction {
-  id: string;
-  concept: string;
-  amount: number;
-  type: "income" | "expense" | "transfer";
-  date: string;
-}
-
-export function TransactionList({ transactions }: { transactions: Transaction[] }) {
+export function TransactionList({ transactions }: TransactionListProps) {
   if (transactions.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center shadow-sm">

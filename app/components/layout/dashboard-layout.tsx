@@ -1,7 +1,7 @@
 // app/components/layout/dashboard-layout.tsx
 import { Form, Link, useLocation } from "react-router";
 import { Button } from "~/components/ui/button";
-import { LayoutDashboard, Wallet, LogOut, PieChart, Repeat, Calculator, Coins } from "lucide-react";
+import { LayoutDashboard, Wallet, LogOut, PieChart, Repeat, Calculator, Coins, BarChart3, Tags } from "lucide-react";
 import type { DashboardLayoutProps } from "~/types";
 
 export function DashboardLayout({ userEmail, children }: DashboardLayoutProps) {
@@ -11,10 +11,12 @@ export function DashboardLayout({ userEmail, children }: DashboardLayoutProps) {
   const navItems = [
     { name: "Resumen", path: "/dashboard", icon: LayoutDashboard },
     { name: "Mis Cuentas", path: "/dashboard/cuentas", icon: Wallet },
+    { name: "Categorías", path: "/dashboard/categorias", icon: Tags },
     { name: "Presupuestos", path: "/dashboard/presupuestos", icon: PieChart },
     { name: "Monedas", path: "/dashboard/monedas", icon: Coins },
     { name: "Suscripciones", path: "/dashboard/suscripciones", icon: Repeat },
     { name: "Planificador", path: "/dashboard/planificador", icon: Calculator },
+    { name: "Análisis", path: "/dashboard/analytics", icon: BarChart3 },
   ];
 
   return (
