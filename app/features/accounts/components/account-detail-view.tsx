@@ -1,12 +1,14 @@
-import { useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router";
 import { ArrowLeft } from "lucide-react";
-import { toast } from "sonner";
 
 import { DashboardLayout } from "~/components/layout/dashboard-layout";
+import { AlertCenterPanel } from "~/components/ui/alert-center-panel";
 import { AccountHeader } from "~/features/accounts/components/account-header";
 import { CycleManager } from "~/features/cycles/components/cycle-manager";
 import { CycleHistory } from "~/features/cycles/components/cycle-history";
+import { useAccountActionFeedback } from "~/features/accounts/hooks/use-account-action-feedback";
+import { usePersistentAlertCenter } from "~/hooks/use-persistent-alert-center";
 import { FormError } from "~/components/ui/form-error";
 import type { AccountDetailViewProps } from "~/types";
 
@@ -15,6 +17,7 @@ export function AccountDetailView({
   wallet,
   cycles,
   categories,
+  budgets,
   otherWallets,
   rates,
   actionData,
@@ -25,50 +28,43 @@ export function AccountDetailView({
     () => cycles.filter((cycle) => !cycle.is_closed),
     [cycles],
   );
-//use memO
-  const currentBalance = useMemo(() => {
-    const allTransactions = cycles.flatMap((cycle) => cycle.transactions || []);
 
-    const netChange = allTransactions.reduce((acc, transaction) => {
-      const isIncome = transaction.type === "income";
-      const amount = Number(transaction.amount);
+  const currentBalance = Number(wallet.current_balance || 0);
 
-      if (wallet.is_liability) {
-        return isIncome ? acc - amount : acc + amount;
-      }
+  const {
+    alerts,
+    unreadCount,
+    isOpen,
+    addAlert,
+    clearAll,
+    dismissAlert,
+    toggleOpen,
+  } = usePersistentAlertCenter(`account-alerts:${userEmail}`);
 
-      return isIncome ? acc + amount : acc - amount;
-    }, 0);
-
-    return Number(wallet.initial_balance) + netChange;
-  }, [cycles, wallet.initial_balance, wallet.is_liability]);
-
-  useEffect(() => {
-    if (!isSubmitting && actionData?.success) {
-      if (actionData.intent === "add_transaction") {
-        if (actionData.warning) {
-          toast.warning(actionData.warning, { duration: 8000 });
-        } else {
-          toast.success("Movimiento registrado correctamente");
-        }
-      }
-      if (actionData.intent === "import_csv") {
-        toast.success(`¡Éxito! Se han importado ${actionData.count} movimientos correctamente.`);
-      }
-    }
-  }, [isSubmitting, actionData]);
+  useAccountActionFeedback({ actionData, actionError, isSubmitting, onFeedback: addAlert });
 
   return (
     <DashboardLayout userEmail={userEmail}>
       <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <FormError error={actionError} />
 
-        <Link
-          to="/dashboard/cuentas"
-          className="inline-flex items-center text-sm font-medium text-slate-500 transition-colors hover:text-slate-900"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" /> Mis Cuentas
-        </Link>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Link
+            to="/dashboard/cuentas"
+            className="inline-flex items-center text-sm font-medium text-slate-500 transition-colors hover:text-slate-900"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" /> Mis Cuentas
+          </Link>
+
+          <AlertCenterPanel
+            alerts={alerts}
+            unreadCount={unreadCount}
+            isOpen={isOpen}
+            onToggle={toggleOpen}
+            onClearAll={clearAll}
+            onDismissAlert={dismissAlert}
+          />
+        </div>
 
         <AccountHeader
           name={wallet.name}
@@ -85,6 +81,7 @@ export function AccountDetailView({
               isSubmitting={isSubmitting} 
               shareDivisor={wallet.share_divisor} 
               categories={categories} 
+              budgets={budgets}
               otherWallets={otherWallets}
               rates={rates}
               currentCurrency={wallet.currency}
@@ -92,7 +89,7 @@ export function AccountDetailView({
           </div>
 
           <div className="lg:col-span-2">
-            <CycleHistory cycles={cycles} categories={categories} currency={wallet.currency} />
+            <CycleHistory cycles={cycles} categories={categories} budgets={budgets} currency={wallet.currency} />
           </div>
         </div>
       </div>

@@ -4,7 +4,7 @@ import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 import { getSupabase } from "~/utils/supabase.server";
 import { DashboardView } from "~/features/dashboard/components/dashboard-view";
 import { mapRawWallets } from "~/utils/wallets.server";
-import type { WalletViewModel } from "~/types/models";
+import type { DashboardWallet, DashboardTransaction } from "~/types";
 
 // (Loader y Action se mantienen exactamente igual, la seguridad no cambia)
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -15,13 +15,33 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const [walletsResponse, transactionsResponse] = await Promise.all([
     supabase.from('wallets').select("*, transactions!transactions_wallet_id_fkey(amount, type)").order('created_at', { ascending: true }),
-    supabase.from('transactions').select('*, wallets(name, currency)').order('date', { ascending: false }).limit(10)
+    supabase.from('transactions').select('id, concept, amount, type, date, wallets(name, currency)').order('date', { ascending: false }).limit(10)
   ]);
 
-  const wallets: WalletViewModel[] = mapRawWallets(walletsResponse.data);
+  const rawWallets = walletsResponse.data || [];
+  const wallets: DashboardWallet[] = mapRawWallets(rawWallets).map((w: any) => ({
+    id: w.id || "",
+    name: w.name,
+    type: w.type || "account",
+    initial_balance: Number(w.initial_balance || 0),
+    current_balance: Number(w.current_balance || 0),
+    is_liability: w.is_liability,
+    currency: w.currency
+  }));
+
+  // Mapeo seguro: transforma el resultado de Supabase (que retorna la relación wallets como un array) a nuestro modelo esperado
+  const rawTransactions = transactionsResponse.data || [];
+  const transactions: DashboardTransaction[] = rawTransactions.map((tx: any) => ({
+    id: tx.id,
+    concept: tx.concept,
+    amount: tx.amount,
+    type: tx.type,
+    date: tx.date,
+    wallets: Array.isArray(tx.wallets) ? tx.wallets[0] : tx.wallets
+  }));
 
   return data(
-    { user, wallets, transactions: transactionsResponse.data || [] },
+    { user, wallets, transactions },
     { headers }
   );
 }
