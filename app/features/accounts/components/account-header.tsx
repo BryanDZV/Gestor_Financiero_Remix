@@ -1,20 +1,23 @@
 import { formatMoney, getBalanceColor } from "~/lib/utils";
 import { Badge } from "~/components/ui/badge";
+import { Progress } from "~/components/ui/progress";
 import type { AccountHeaderProps } from "~/types";
 
 export function AccountHeader({ name, isLiability, targetAmount, currentBalance, currency = 'EUR' }: AccountHeaderProps) {
-  const balanceClass = getBalanceColor(currentBalance, isLiability);
+  const target = Number(targetAmount || 0);
+  const balance = Number(currentBalance || 0);
+  const balanceClass = getBalanceColor(balance, isLiability);
 
   // Calculamos el progreso si el usuario estableció una meta
-  const hasTarget = targetAmount > 0;
+  const hasTarget = target > 0;
   let progress = 0;
   if (hasTarget) {
     if (isLiability) {
       // Para deudas, el progreso es cuánto hemos bajado desde la deuda original (target) hasta el saldo actual
-      progress = Math.max(0, Math.min(100, ((targetAmount - currentBalance) / targetAmount) * 100));
+      progress = Math.max(0, Math.min(100, ((target - balance) / target) * 100));
     } else {
       // Para ahorros, el progreso es cuánto nos acercamos a la meta
-      progress = Math.max(0, Math.min(100, (currentBalance / targetAmount) * 100));
+      progress = Math.max(0, Math.min(100, (balance / target) * 100));
     }
   }
 
@@ -37,8 +40,8 @@ export function AccountHeader({ name, isLiability, targetAmount, currentBalance,
           </div>
           <p className="mt-2 text-sm text-slate-500">
             {isLiability 
-              ? hasTarget ? `Deuda original: ${formatMoney(targetAmount, currency)}` : "Cuenta de pasivo / deuda"
-              : hasTarget ? `Meta a alcanzar: ${formatMoney(targetAmount, currency)}` : "Cuenta de ahorro / activo"}
+              ? hasTarget ? `Deuda original: ${formatMoney(target, currency)}` : "Cuenta de pasivo / deuda"
+              : hasTarget ? `Meta a alcanzar: ${formatMoney(target, currency)}` : "Cuenta de ahorro / activo"}
           </p>
           
           {hasTarget && (
@@ -47,12 +50,11 @@ export function AccountHeader({ name, isLiability, targetAmount, currentBalance,
                 <span>Progreso {isLiability ? 'de liquidación' : 'de ahorro'}</span>
                 <span className="tabular-nums">{progress.toFixed(1)}%</span>
               </div>
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
-                <div 
-                  className={`h-full rounded-full transition-all duration-700 ease-out ${isLiability ? 'bg-amber-500' : 'bg-emerald-500'}`}
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
+              <Progress 
+                value={progress} 
+                indicatorClassName={isLiability ? 'bg-amber-500' : 'bg-emerald-500'} 
+                className="h-2.5" 
+              />
             </div>
           )}
         </div>
@@ -60,7 +62,7 @@ export function AccountHeader({ name, isLiability, targetAmount, currentBalance,
         <div className="shrink-0 rounded-2xl bg-slate-50 px-4 py-3 text-left lg:min-w-56 lg:text-right">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Saldo actual</p>
           <p className={`mt-2 text-3xl font-semibold tracking-tight tabular-nums sm:text-4xl ${balanceClass}`}>
-            {formatMoney(currentBalance, currency)}
+            {formatMoney(balance, currency)}
           </p>
         </div>
       </div>
