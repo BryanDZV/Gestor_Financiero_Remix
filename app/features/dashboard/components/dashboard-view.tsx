@@ -33,7 +33,7 @@ export function DashboardView({ userEmail, wallets, transactions }: DashboardVie
       <div className="mx-auto max-w-6xl space-y-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <header className="border-b border-slate-200 pb-6">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Resumen General</h1>
-          <p className="mt-2 text-sm text-slate-500">Un vistazo rápido a tu estado financiero sincronizado.</p>
+          
         </header>
 
         {/* TARJETAS DE PATRIMONIO POR MONEDA */}
@@ -45,32 +45,44 @@ export function DashboardView({ userEmail, wallets, transactions }: DashboardVie
                   Patrimonio en {currency}
                 </h2>
               )}
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-                <Card className="bg-slate-900 text-white shadow-md border-0">
-                  <CardContent className="p-6">
-                    <p className="text-sm font-medium text-slate-400 uppercase tracking-widest">Patrimonio Neto</p>
-                    <p className="mt-2 text-4xl font-bold tracking-tight">{formatMoney(netWorth, currency)}</p>
-                  </CardContent>
-                </Card>
 
-                <Card className="bg-emerald-50 border-emerald-100">
-                  <CardContent className="p-6">
-                    <p className="text-sm font-medium text-emerald-700 uppercase tracking-widest flex items-center">
-                      <Icon icon="ph:wallet" className="mr-2 size-4" /> Liquidez Total
-                    </p>
-                    <p className="mt-2 text-3xl font-bold tracking-tight text-emerald-900">{formatMoney(assets, currency)}</p>
-                  </CardContent>
-                </Card>
+              <Card className="overflow-hidden border-slate-200 shadow-sm relative">
+                {/* Elemento de diseño de fondo sutil */}
+                <div className="absolute -right-12 -top-12 size-40 rounded-full bg-blue-500/5 blur-2xl pointer-events-none"></div>
+                
+                <CardContent className="p-6 sm:p-8">
+                  <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between relative z-10">
+                    <div>
+                      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500 mb-1.5 flex items-center gap-2">
+                        Patrimonio Neto 
+                        <span title="Liquidez Total - Deuda Total = Tu riqueza real" className="flex">
+                          <Icon icon="ph:info" className="size-4 text-slate-400" />
+                        </span>
+                      </p>
+                      <h2 className={`text-4xl sm:text-5xl font-bold tracking-tight ${netWorth < 0 ? 'text-red-600' : 'text-slate-900'}`}>
+                        {formatMoney(netWorth, currency)}
+                      </h2>
+                    </div>
 
-                <Card className="bg-red-50 border-red-100">
-                  <CardContent className="p-6">
-                    <p className="text-sm font-medium text-red-700 uppercase tracking-widest flex items-center">
-                      <Icon icon="ph:credit-card" className="mr-2 size-4" /> Deuda Total
-                    </p>
-                    <p className="mt-2 text-3xl font-bold tracking-tight text-red-900">{formatMoney(liabilities, currency)}</p>
-                  </CardContent>
-                </Card>
-              </div>
+                    <div className="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-2xl bg-slate-50 p-4 border border-slate-100">
+                      <div>
+                        <p className="text-xs font-medium text-slate-500 flex items-center gap-1.5 uppercase tracking-wider mb-1"><Icon icon="ph:wallet-duotone" className="size-4 text-emerald-500" /> Liquidez Total</p>
+                        <p className="text-xl font-semibold text-slate-800">{formatMoney(assets, currency)}</p>
+                      </div>
+                      <div className="w-px h-8 bg-slate-200 hidden sm:block"></div>
+                      <div>
+                        <p className="text-xs font-medium text-slate-500 flex items-center gap-1.5 uppercase tracking-wider mb-1"><Icon icon="ph:credit-card-duotone" className="size-4 text-red-500" /> Deuda Total</p>
+                        <p className="text-xl font-semibold text-slate-800">{formatMoney(liabilities, currency)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex h-2.5 w-full overflow-hidden rounded-full bg-slate-100 relative z-10" title="Proporción Activos vs Pasivos">
+                    {(assets > 0 || liabilities > 0) && <div style={{ width: `${(assets / (assets + liabilities)) * 100}%` }} className="bg-emerald-500 transition-all duration-1000 ease-out"></div>}
+                    {(assets > 0 || liabilities > 0) && <div style={{ width: `${(liabilities / (assets + liabilities)) * 100}%` }} className="bg-red-500 transition-all duration-1000 ease-out"></div>}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           ))}
         </div>
