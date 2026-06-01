@@ -5,7 +5,6 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { Icon } from "@iconify/react";
 import { DashboardLayout } from "~/components/layout/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import { Button } from "~/components/ui/button";
 import { formatMoney, formatDate } from "~/lib/utils";
 import { MultiSelectActions } from "~/components/ui/multi-select-actions";
 import { PageHeader } from "~/components/ui/page-header";
@@ -13,9 +12,9 @@ import { FormError } from "~/components/ui/form-error";
 import { EmptyState } from "~/components/ui/empty-state";
 import { Input } from "~/components/ui/input";
 import { SelectNative } from "~/components/ui/select-native";
-import { Badge } from "~/components/ui/badge";
-import { SelectionIndicator } from "~/components/ui/selection-indicator";
+import { SubmitButton } from "~/components/ui/submit-button";
 import type { SubscriptionsViewProps } from "~/types";
+import { SubscriptionCard } from "./subscription-card";
 
 export function SubscriptionsView({ userEmail, subscriptions, wallets }: SubscriptionsViewProps) {
   const navigation = useNavigation();
@@ -33,6 +32,12 @@ export function SubscriptionsView({ userEmail, subscriptions, wallets }: Subscri
       setSelectedIds(new Set());
     }
   }, [navigation.state, actionData]);
+
+  const handleToggleSelection = (id: string) => {
+    const newSet = new Set(selectedIds);
+    newSet.has(id) ? newSet.delete(id) : newSet.add(id);
+    setSelectedIds(newSet);
+  };
 
   // Calculamos el costo mensual total separado por moneda use memo
   const monthlyCostsByCurrency = useMemo(() => {
@@ -127,9 +132,9 @@ export function SubscriptionsView({ userEmail, subscriptions, wallets }: Subscri
                     </SelectNative>
                   </div>
 
-                  <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-xl bg-blue-600 text-white shadow-sm hover:bg-blue-700">
+                  <SubmitButton isSubmitting={isSubmitting}>
                     Guardar suscripción
-                  </Button>
+                  </SubmitButton>
                 </Form>
               </CardContent>
             </Card>
@@ -140,39 +145,13 @@ export function SubscriptionsView({ userEmail, subscriptions, wallets }: Subscri
               <EmptyState message="No tienes suscripciones registradas." className="sm:col-span-2" />
             ) : (
               subscriptions.map((sub) => (
-                <Card key={sub.id} onClick={() => { if (isDeleteMode) { const newSet = new Set(selectedIds); newSet.has(sub.id) ? newSet.delete(sub.id) : newSet.add(sub.id); setSelectedIds(newSet); } }} className={`relative transition-all ${isDeleteMode ? 'cursor-pointer' : ''} ${isDeleteMode && selectedIds.has(sub.id) ? 'ring-2 ring-red-500' : ''} ${!sub.active && !isDeleteMode ? 'opacity-60 bg-slate-50' : ''}`}>
-                  {isDeleteMode && (
-                    <div className="absolute right-4 top-4 z-20">
-                      <SelectionIndicator isSelected={selectedIds.has(sub.id)} />
-                    </div>
-                  )}
-                  
-                  <CardContent className="p-5 flex flex-col h-full justify-between gap-4">
-                    <div className="flex justify-between items-start gap-4 pr-6">
-                      <div>
-                        <h3 className="font-semibold text-slate-900 line-clamp-1">{sub.name}</h3>
-                        <p className="text-sm font-medium text-slate-500 mt-1">
-                          {sub.billing_period === 'yearly' ? 'Facturación Anual' : 'Facturación Mensual'}
-                          {sub.start_date && ` • Desde: ${formatDate(sub.start_date)}`}
-                          {sub.wallets?.name && <span className="ml-2 inline-flex items-center text-indigo-600"><Icon icon="ph:wallet" className="mr-1 size-3.5" /> {sub.wallets.name}</span>}
-                        </p>
-                      </div>
-                      <Badge variant={sub.active ? "secondary" : "default"}>{sub.active ? "Activa" : "Pausada"}</Badge>
-                    </div>
-                    
-                    <div className="flex items-end justify-between border-t border-slate-100 pt-4">
-                      <p className="text-2xl font-bold tracking-tight text-slate-800">{formatMoney(sub.amount, sub.wallets?.currency)}</p>
-                      {!isDeleteMode && (
-                        <Form method="post">
-                          <input type="hidden" name="_intent" value="toggle_subscription" />
-                          <input type="hidden" name="subscription_id" value={sub.id} />
-                          <input type="hidden" name="active" value={sub.active.toString()} />
-                          <button type="submit" className={`text-xs font-medium hover:underline ${sub.active ? 'text-amber-600' : 'text-emerald-600'}`}>{sub.active ? 'Pausar cobro' : 'Reactivar'}</button>
-                        </Form>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                <SubscriptionCard
+                  key={sub.id}
+                  subscription={sub}
+                  isDeleteMode={isDeleteMode}
+                  isSelected={selectedIds.has(sub.id)}
+                  onToggle={() => handleToggleSelection(sub.id)}
+                />
               ))
             )}
           </div>
