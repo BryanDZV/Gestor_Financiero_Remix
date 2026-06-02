@@ -59,6 +59,7 @@ export type AccountsWallet = {
   current_balance: number;
   currency?: string;
   share_divisor?: number;
+  target_amount?: number;
 };
 
 export type DashboardWallet = {

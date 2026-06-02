@@ -7,6 +7,7 @@ import { mapRawWallets } from "~/utils/wallets.server";
 import type { AccountsWallet } from "~/types";
 import { getCurrencyOptionsList } from "~/utils/currency-helpers.server";
 import { handleCreateWallet, handleDeleteWallets } from "~/utils/wallet-mutations.server";
+import { PrivacyProvider } from "~/hooks/use-privacy";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabase(request);
@@ -24,7 +25,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     ...w,
     id: w.id || "",
     type: w.type || "account",
-    current_balance: Number(w.current_balance || 0)
+    current_balance: Number(w.current_balance || 0),
+    target_amount: Number(w.target_amount || 0)
   }));
 
   const currencyOptions = await getCurrencyOptionsList();
@@ -46,6 +48,17 @@ export async function action({ request }: ActionFunctionArgs) {
     return handleCreateWallet(formData, user.id, supabase, headers);
   }
 
+  if (intent === "edit_wallet") {
+    const walletId = formData.get("wallet_id") as string;
+    const name = formData.get("name") as string;
+    const targetAmount = parseFloat(formData.get("target_amount") as string) || 0;
+    const shareDivisor = parseInt(formData.get("share_divisor") as string, 10) || 1;
+
+    const { error } = await supabase.from('wallets').update({ name, target_amount: targetAmount, share_divisor: shareDivisor }).eq('id', walletId).eq('user_id', user.id);
+    if (error) return data({ error: error.message }, { headers });
+    return data({ success: true }, { headers });
+  }
+
   if (intent === "delete_wallets") {
     return handleDeleteWallets(formData, supabase, headers);
   }
@@ -55,5 +68,9 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function AccountsRoute() {
   const { user, wallets, currencyOptions } = useLoaderData<typeof loader>();
-  return <AccountsView userEmail={user.email || ""} wallets={wallets} currencyOptions={currencyOptions} />;
+  return (
+    <PrivacyProvider namespace="accounts">
+      <AccountsView userEmail={user.email || ""} wallets={wallets} currencyOptions={currencyOptions} />
+    </PrivacyProvider>
+  );
 }

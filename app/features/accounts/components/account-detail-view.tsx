@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { Link } from "react-router";
 import { ArrowLeft } from "lucide-react";
+import { Icon } from "@iconify/react";
+import { Button } from "~/components/ui/button";
 
 import { DashboardLayout } from "~/components/layout/dashboard-layout";
 import { AlertCenterPanel } from "~/components/ui/alert-center-panel";
@@ -11,6 +13,7 @@ import { useAccountActionFeedback } from "~/features/accounts/hooks/use-account-
 import { usePersistentAlertCenter } from "~/hooks/use-persistent-alert-center";
 import { FormError } from "~/components/ui/form-error";
 import type { AccountDetailViewProps } from "~/types";
+import { usePrivacy } from "~/hooks/use-privacy";
 
 export function AccountDetailView({
   userEmail,
@@ -40,6 +43,7 @@ export function AccountDetailView({
     dismissAlert,
     toggleOpen,
   } = usePersistentAlertCenter(`account-alerts:${userEmail}`);
+  const { isPrivate, togglePrivacy } = usePrivacy();
 
   useAccountActionFeedback({ actionData, actionError, isSubmitting, onFeedback: addAlert });
 
@@ -56,6 +60,11 @@ export function AccountDetailView({
             <ArrowLeft className="w-4 h-4 mr-2" /> Mis Cuentas
           </Link>
 
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={togglePrivacy} className="rounded-xl border-slate-200 bg-white text-slate-700 h-10">
+            <Icon icon={isPrivate ? "ph:eye-slash-duotone" : "ph:eye-duotone"} className="size-4 sm:mr-2" />
+            <span className="hidden sm:inline">{isPrivate ? "Mostrar" : "Ocultar"}</span>
+          </Button>
           <AlertCenterPanel
             alerts={alerts}
             unreadCount={unreadCount}
@@ -64,6 +73,7 @@ export function AccountDetailView({
             onClearAll={clearAll}
             onDismissAlert={dismissAlert}
           />
+        </div>
         </div>
 
         <AccountHeader

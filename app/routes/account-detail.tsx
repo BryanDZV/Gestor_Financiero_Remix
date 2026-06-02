@@ -7,6 +7,7 @@ import { handleCreateCycle, handleDeleteCycle, handleUpdateCycleStatus } from "~
 import { handleAddTransaction, handleDeleteTransactions, handleEditTransaction } from "~/utils/transactions.server";
 import type { AccountActionData } from "~/types";
 import { mapRawWallets } from "~/utils/wallets.server";
+import { PrivacyProvider } from "~/hooks/use-privacy";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabase(request);
@@ -166,17 +167,19 @@ export default function AccountDetailRoute() {
   const isSubmitting = navigation.state !== "idle";
 
   return (
-    <AccountDetailView
-      userEmail={user.email || ""}
-      wallet={wallet}
-      cycles={cycles}
-      categories={categories}
-      budgets={budgets}
-      otherWallets={otherWallets}
-      rates={rates}
-      actionData={actionData as AccountActionData | undefined}
-      actionError={actionData && "error" in actionData ? actionData.error : undefined}
-      isSubmitting={isSubmitting}
-    />
+    <PrivacyProvider namespace="account-detail">
+      <AccountDetailView
+        userEmail={user.email || ""}
+        wallet={wallet}
+        cycles={cycles}
+        categories={categories}
+        budgets={budgets}
+        otherWallets={otherWallets}
+        rates={rates}
+        actionData={actionData as AccountActionData | undefined}
+        actionError={actionData && "error" in actionData ? actionData.error : undefined}
+        isSubmitting={isSubmitting}
+      />
+    </PrivacyProvider>
   );
 }

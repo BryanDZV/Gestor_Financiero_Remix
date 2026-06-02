@@ -2,6 +2,7 @@ import { formatMoney, getBalanceColor } from "~/lib/utils";
 import { Badge } from "~/components/ui/badge";
 import { Progress } from "~/components/ui/progress";
 import type { AccountHeaderProps } from "~/types";
+import { PrivacyBlur } from "~/components/ui/privacy-blur";
 
 export function AccountHeader({ name, isLiability, targetAmount, currentBalance, currency = 'EUR' }: AccountHeaderProps) {
   const target = Number(targetAmount || 0);
@@ -40,8 +41,8 @@ export function AccountHeader({ name, isLiability, targetAmount, currentBalance,
           </div>
           <p className="mt-2 text-sm text-slate-500">
             {isLiability 
-              ? hasTarget ? `Deuda original: ${formatMoney(target, currency)}` : "Cuenta de pasivo / deuda"
-              : hasTarget ? `Meta a alcanzar: ${formatMoney(target, currency)}` : "Cuenta de ahorro / activo"}
+              ? hasTarget ? <span>Deuda original: <PrivacyBlur>{formatMoney(target, currency)}</PrivacyBlur></span> : "Cuenta de pasivo / deuda"
+              : hasTarget ? <span>Meta a alcanzar: <PrivacyBlur>{formatMoney(target, currency)}</PrivacyBlur></span> : "Cuenta de ahorro / activo"}
           </p>
           
           {hasTarget && (
@@ -62,7 +63,9 @@ export function AccountHeader({ name, isLiability, targetAmount, currentBalance,
         <div className="shrink-0 rounded-2xl bg-slate-50 px-4 py-3 text-left lg:min-w-56 lg:text-right">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Saldo actual</p>
           <p className={`mt-2 text-3xl font-semibold tracking-tight tabular-nums sm:text-4xl ${balanceClass}`}>
-            {formatMoney(balance, currency)}
+            <PrivacyBlur>
+              {formatMoney(balance, currency)}
+            </PrivacyBlur>
           </p>
         </div>
       </div>

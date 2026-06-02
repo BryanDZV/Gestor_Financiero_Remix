@@ -18,8 +18,10 @@ import { CurrencySelect } from "~/components/ui/currency-select";
 import { SelectionIndicator } from "~/components/ui/selection-indicator";
 import { SubmitButton } from "~/components/ui/submit-button";
 import { Collapsible } from "~/components/ui/collapsible";
-import type { AccountsViewProps } from "~/types";
+import type { AccountsViewProps, AccountsWallet } from "~/types";
 import { formatMoney } from "~/lib/utils";
+import { usePrivacy } from "~/hooks/use-privacy";
+import { PrivacyBlur } from "~/components/ui/privacy-blur";
 
 export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "USD", "GBP", "MXN"] }: AccountsViewProps & { currencyOptions?: string[] }) {
   const navigation = useNavigation();
@@ -29,15 +31,24 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
   const [showForm, setShowForm] = useState(false);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [selectedWallets, setSelectedWallets] = useState<Set<string>>(new Set());
+  const [editingWallet, setEditingWallet] = useState<AccountsWallet | null>(null);
+  const [wasSubmitting, setWasSubmitting] = useState(false);
+  const { isPrivate, togglePrivacy } = usePrivacy();
 
-  // Escuchamos el estado de la petición. Solo cerramos el formulario si fue exitosa.
+  // Auto-cierre infalible: detecta cuando termina la petición de red
   useEffect(() => {
-    if (navigation.state === "idle" && actionData?.success) {
-      setShowForm(false);
-      setIsDeleteMode(false);
-      setSelectedWallets(new Set());
+    if (navigation.state === "submitting") {
+      setWasSubmitting(true);
+    } else if (navigation.state === "idle" && wasSubmitting) {
+      setWasSubmitting(false);
+      if (!actionData?.error) {
+        setShowForm(false);
+        setIsDeleteMode(false);
+        setSelectedWallets(new Set());
+        setEditingWallet(null);
+      }
     }
-  }, [navigation.state, actionData]);
+  }, [navigation.state, actionData, wasSubmitting]);
 
   // Datos para el gráfico de resumen del portafolio con useMemo para evitar cálculos innecesarios en cada renderizado. Solo se recalcula cuando cambian las wallets.
   const portfolioChartData = useMemo(() => {
@@ -50,7 +61,7 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
     ].filter(d => d.value > 0);
   }, [wallets]);
 
-  const formatChartMoney = (value: number) => formatMoney(value, currencyOptions[0] || "EUR");
+  const formatChartMoney = (value: number) => isPrivate ? "***" : formatMoney(value, currencyOptions[0] || "EUR");
 
   return (
     <DashboardLayout userEmail={userEmail}>
@@ -63,6 +74,10 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
           />
           
           <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" onClick={togglePrivacy} className="rounded-xl border-slate-200 bg-white text-slate-700 h-10">
+              <Icon icon={isPrivate ? "ph:eye-slash-duotone" : "ph:eye-duotone"} className="size-4 sm:mr-2" />
+              <span className="hidden sm:inline">{isPrivate ? "Mostrar saldos" : "Ocultar saldos"}</span>
+            </Button>
             <MultiSelectActions
               isDeleteMode={isDeleteMode}
               selectedCount={selectedWallets.size}
@@ -78,9 +93,16 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
               }}
               itemName="cuenta(s)"
             >
-              <Button type="button" onClick={() => { setShowForm((current) => !current); setIsDeleteMode(false); }} variant="outline" className="rounded-xl border-slate-200 bg-white text-slate-700">
+              <Button type="button" onClick={() => { 
+                if (showForm && !editingWallet) setShowForm(false);
+                else {
+                  setShowForm(true);
+                  setEditingWallet(null);
+                }
+                setIsDeleteMode(false); 
+              }} variant="outline" className="rounded-xl border-slate-200 bg-white text-slate-700">
                 <PlusCircle className="mr-2 size-4" />
-                {showForm ? "Cancelar" : "Nueva Cuenta"}
+                {showForm && !editingWallet ? "Cancelar" : "Nueva Cuenta"}
               </Button>
             </MultiSelectActions>
           </div>
@@ -89,36 +111,44 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
         {showForm && (
           <Card className="max-w-2xl border-dashed border-slate-300">
             <CardHeader>
-              <CardTitle>Registrar cuenta</CardTitle>
-              <CardDescription>Configura una nueva cuenta o pasivo con su saldo inicial.</CardDescription>
+              <CardTitle className="flex justify-between items-center">
+                <span>{editingWallet ? "Editar cuenta" : "Registrar cuenta"}</span>
+                {editingWallet && (
+                  <Button variant="ghost" size="icon" onClick={() => { setEditingWallet(null); setShowForm(false); }} className="h-8 w-8 rounded-full" aria-label="Cerrar formulario de edición">
+                    <Icon icon="ph:x" className="size-4 text-slate-500" />
+                  </Button>
+                )}
+              </CardTitle>
+              <CardDescription>{editingWallet ? "Modifica los detalles de tu cuenta." : "Configura una nueva cuenta o pasivo con su saldo inicial."}</CardDescription>
             </CardHeader>
             <CardContent>
-              <Form method="post" action="/dashboard/cuentas" className="space-y-5">
-                <input type="hidden" name="_intent" value="create_wallet" />
+              <Form key={editingWallet?.id || 'new'} method="post" action="/dashboard/cuentas" className="space-y-5">
+                <input type="hidden" name="_intent" value={editingWallet ? "edit_wallet" : "create_wallet"} />
+                {editingWallet && <input type="hidden" name="wallet_id" value={editingWallet.id} />}
 
                 <FormError error={actionData?.error} />
 
                 <div className="space-y-2">
                   <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Nombre</label>
-                  <Input type="text" name="name" placeholder="Ej. Tarjeta Crédito" required />
+                  <Input type="text" name="name" placeholder="Ej. Tarjeta Crédito" defaultValue={editingWallet?.name} required />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Moneda</label>
-                  <CurrencySelect name="currency" defaultValue="EUR" options={currencyOptions} />
+                  <CurrencySelect name="currency" defaultValue={editingWallet?.currency || "EUR"} options={currencyOptions} disabled={!!editingWallet} />
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Tipo</label>
-                    <SelectNative name="is_liability" defaultValue="false">
+                    <SelectNative name="is_liability" defaultValue={editingWallet ? (editingWallet.is_liability ? "true" : "false") : "false"} disabled={!!editingWallet}>
                       <option value="false">Activo (Cuenta bancaria / Ahorro)</option>
                       <option value="true">Pasivo (Deuda real)</option>
                     </SelectNative>
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Saldo inicial</label>
-                    <Input type="number" step="0.01" name="initial_balance" placeholder="0.00" required className="tabular-nums" />
+                    <Input type="number" step="0.01" name="initial_balance" defaultValue={editingWallet?.initial_balance} placeholder="0.00" required={!editingWallet} disabled={!!editingWallet} className="tabular-nums" />
                   </div>
                 </div>
 
@@ -126,7 +156,7 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
                   <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
                     Meta de Ahorro / Deuda Total (Opcional)
                   </label>
-                  <Input type="number" step="0.01" name="target_amount" defaultValue={0} min={0} />
+                  <Input type="number" step="0.01" name="target_amount" defaultValue={editingWallet?.target_amount || 0} min={0} />
                   <p className="text-xs text-slate-500">¿Cuánto quieres ahorrar o de cuánto es tu deuda total?</p>
                 </div>
 
@@ -134,12 +164,12 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
                   <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
                     ¿Cuenta compartida? (Nº personas)
                   </label>
-                  <Input type="number" name="share_divisor" defaultValue={1} min={1} required />
+                  <Input type="number" name="share_divisor" defaultValue={editingWallet?.share_divisor || 1} min={1} required />
                   <p className="text-xs text-slate-500">Deja 1 si es personal.</p>
                 </div>
 
                 <SubmitButton isSubmitting={isSubmitting}>
-                  Guardar cuenta
+                  {editingWallet ? "Guardar cambios" : "Guardar cuenta"}
                 </SubmitButton>
               </Form>
             </CardContent>
@@ -153,6 +183,26 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
             wallets.map((wallet) => (
               <div key={wallet.id} className="group relative block h-full">
                 <div className="relative h-full transition-transform duration-200 group-hover:-translate-y-0.5">
+                  {!isDeleteMode && (
+                    <div className="absolute right-3 top-3 z-20 opacity-0 transition-opacity group-hover:opacity-100">
+                      <Button 
+                        type="button"
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={(e) => { 
+                          e.preventDefault(); 
+                          e.stopPropagation(); 
+                          setEditingWallet(wallet); 
+                          setShowForm(true); 
+                          window.scrollTo({ top: 0, behavior: 'smooth' }); 
+                        }} 
+                        className="h-8 w-8 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-slate-50 hover:text-blue-600"
+                        aria-label={`Editar cuenta ${wallet.name}`}
+                      >
+                        <Icon icon="ph:pencil-simple-duotone" className="size-4" />
+                      </Button>
+                    </div>
+                  )}
                   {wallet.is_liability && (
                     <div className="absolute -left-2 -top-2 z-10 rounded-full border border-red-200 bg-red-50 p-1.5 text-red-600 shadow-sm">
                       <TrendingDown className="size-4" />
