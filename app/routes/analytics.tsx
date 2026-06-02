@@ -1,8 +1,15 @@
 import { data, redirect, useLoaderData } from "react-router";
-import type { LoaderFunctionArgs } from "react-router";
+import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 import { getSupabase } from "~/utils/supabase.server";
 import { AnalyticsView } from "~/features/analytics/components/analytics-view";
 import { getAnalyticsData } from "~/utils/analytics.server";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Análisis Visual | Finanzas Pro" },
+    { name: "description", content: "Interpreta tus datos, descubre tendencias y evalúa tu salud financiera con gráficos interactivos." },
+  ];
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabase(request);

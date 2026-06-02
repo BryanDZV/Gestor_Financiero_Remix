@@ -1,6 +1,6 @@
 // app/routes/accounts.tsx
 import { data, redirect, useLoaderData } from "react-router";
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
+import type { LoaderFunctionArgs, ActionFunctionArgs, MetaFunction } from "react-router";
 import { getSupabase } from "~/utils/supabase.server";
 import { AccountsView } from "~/features/accounts/components/accounts-view";
 import { mapRawWallets } from "~/utils/wallets.server";
@@ -8,6 +8,13 @@ import type { AccountsWallet } from "~/types";
 import { getCurrencyOptionsList } from "~/utils/currency-helpers.server";
 import { handleCreateWallet, handleDeleteWallets } from "~/utils/wallet-mutations.server";
 import { PrivacyProvider } from "~/hooks/use-privacy";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Mis Cuentas | Finanzas Pro" },
+    { name: "description", content: "Gestiona todas tus cuentas bancarias, tarjetas de crédito, efectivo e inversiones desde un solo lugar." },
+  ];
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabase(request);

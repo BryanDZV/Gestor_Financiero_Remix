@@ -1,8 +1,15 @@
 import { data, redirect, useLoaderData } from "react-router";
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
+import type { LoaderFunctionArgs, ActionFunctionArgs, MetaFunction } from "react-router";
 import { getSupabase } from "~/utils/supabase.server";
 import { SubscriptionsView } from "~/features/subscriptions/components/subscriptions-view";
 import { handleCreateSubscription, handleDeleteSubscriptions, handleToggleSubscription } from "~/utils/subscriptions.server";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Suscripciones y Gastos Fijos | Finanzas Pro" },
+    { name: "description", content: "Lleva el control de tus pagos recurrentes, suscripciones y servicios para no pagar de más." },
+  ];
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabase(request);

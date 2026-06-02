@@ -1,10 +1,17 @@
 import { data, redirect, useActionData, useLoaderData } from "react-router";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "react-router";
 
 import { getSupabase } from "~/utils/supabase.server";
 import { fetchCurrencyOptions, fetchExchangeRatesSnapshot } from "~/utils/exchange-rates.server";
 import { addCurrencyFavorite, fetchCurrencyFavorites, removeCurrencyFavorite } from "~/utils/currency-favorites.server";
 import { CurrencyView } from "~/features/currency/components/currency-view";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Tipos de Cambio | Finanzas Pro" },
+    { name: "description", content: "Consulta las tasas de cambio en tiempo real y gestiona tus monedas favoritas." },
+  ];
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabase(request);

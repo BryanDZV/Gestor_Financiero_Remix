@@ -1,9 +1,16 @@
 import { data, redirect, useLoaderData } from "react-router";
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
+import type { LoaderFunctionArgs, ActionFunctionArgs, MetaFunction } from "react-router";
 import { getSupabase } from "~/utils/supabase.server";
 import { BudgetsView } from "~/features/budgets/components/budgets-view";
 import { getCurrencyOptionsList } from "~/utils/currency-helpers.server";
 import { getBudgetsData, handleCreateBudget, handleEditBudget, handleDeleteBudgets } from "~/utils/budgets.server";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Mis Presupuestos | Finanzas Pro" },
+    { name: "description", content: "Controla cuánto gastas al mes segmentando tus salidas de dinero por categorías o cuentas." },
+  ];
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabase(request);

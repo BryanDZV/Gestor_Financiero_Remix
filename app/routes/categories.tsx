@@ -1,8 +1,15 @@
 import { data, redirect, useLoaderData } from "react-router";
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
+import type { LoaderFunctionArgs, ActionFunctionArgs, MetaFunction } from "react-router";
 import { getSupabase } from "~/utils/supabase.server";
 import { CategoriesView } from "~/features/categories/components/categories-view";
 import { handleCreateCategory, handleDeleteCategories } from "~/utils/budgets.server";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Mis Categorías | Finanzas Pro" },
+    { name: "description", content: "Organiza y personaliza las categorías para tus ingresos y gastos." },
+  ];
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabase(request);
