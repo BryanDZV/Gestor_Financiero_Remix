@@ -20,7 +20,7 @@ export function BudgetProgressCard({ budget, currency = "EUR", onEdit }: BudgetP
       <CardContent className="p-5">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h3 className="font-semibold text-slate-900">{budget.name}</h3>
+            <h2 className="font-semibold text-slate-900">{budget.name}</h2>
             <p className="text-xs font-medium mt-1">
               {!hasLimit 
                 ? <span className="text-slate-500">Gastado este mes</span>
@@ -55,7 +55,7 @@ export function BudgetProgressCard({ budget, currency = "EUR", onEdit }: BudgetP
           <div className="space-y-2">
             <div className="flex justify-between text-sm font-medium">
               <span className={isOverBudget ? "text-red-600 font-bold" : "text-slate-700"}>{formatMoney(spent, currency)}</span>
-              <span className="text-slate-400">de {formatMoney(limit, currency)}</span>
+              <span className="text-slate-500">de {formatMoney(limit, currency)}</span>
             </div>
             <Progress value={percentage} indicatorClassName={progressColor} className="h-2.5 bg-slate-100" />
           </div>

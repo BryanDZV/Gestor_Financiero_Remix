@@ -39,8 +39,8 @@ export function CurrencyFavoritesPanel({ snapshot, options, favorites }: Currenc
         <Form method="post" className="grid gap-3 sm:grid-cols-[1fr_auto]">
           <input type="hidden" name="_intent" value="add_favorite" />
           <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Agregar moneda</label>
-            <SelectNative name="currency_code" value={selectedCode} onChange={(event) => setSelectedCode(event.target.value)}>
+            <label htmlFor="currency_code" className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Agregar moneda</label>
+            <SelectNative id="currency_code" name="currency_code" value={selectedCode} onChange={(event) => setSelectedCode(event.target.value)}>
               {orderedOptions.map((option) => (
                 <option key={option.code} value={option.code}>
                   {option.code} - {option.name}
@@ -88,7 +88,7 @@ export function CurrencyFavoritesPanel({ snapshot, options, favorites }: Currenc
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Favorita</p>
-                      <h3 className="mt-1 text-lg font-semibold text-slate-900">{option.code}</h3>
+                      <h2 className="mt-1 text-lg font-semibold text-slate-900">{option.code}</h2>
                     </div>
                     <Form method="post">
                       <input type="hidden" name="_intent" value="remove_favorite" />

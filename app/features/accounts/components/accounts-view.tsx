@@ -74,7 +74,12 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
           />
           
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" onClick={togglePrivacy} className="rounded-xl border-slate-200 bg-white text-slate-700 h-10">
+            <Button 
+              variant="outline" 
+              onClick={togglePrivacy} 
+              className="rounded-xl border-slate-200 bg-white text-slate-700 h-10"
+              aria-label={isPrivate ? "Mostrar saldos" : "Ocultar saldos"}
+            >
               <Icon icon={isPrivate ? "ph:eye-slash-duotone" : "ph:eye-duotone"} className="size-4 sm:mr-2" />
               <span className="hidden sm:inline">{isPrivate ? "Mostrar saldos" : "Ocultar saldos"}</span>
             </Button>

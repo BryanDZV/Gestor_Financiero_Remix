@@ -50,9 +50,10 @@ export function AnalyticsView({ userEmail, monthlyData, categoryData, dailyData,
         {/* Controles de Filtros */}
         <Form method="get" className="flex flex-wrap gap-4 items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm" onChange={(e) => submit(e.currentTarget)}>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <label className="text-sm font-medium text-slate-600 shrink-0">Ver historial de:</label>
+            <label htmlFor="monthsCount" className="text-sm font-medium text-slate-600 shrink-0">Ver historial de:</label>
             <div className="flex items-center gap-2">
               <Input 
+                id="monthsCount"
                 type="number" 
                 name="monthsCount" 
                 min="1" 
@@ -64,8 +65,8 @@ export function AnalyticsView({ userEmail, monthlyData, categoryData, dailyData,
           </div>
           
           <div className="flex items-center gap-3 w-full sm:w-auto sm:ml-auto">
-            <label className="text-sm font-medium text-slate-600 shrink-0">Ritmo diario de:</label>
-            <SelectNative name="targetMonth" defaultValue={selectedTargetMonth} className="bg-slate-50 border-slate-200 text-sm py-2 sm:w-48">
+            <label htmlFor="targetMonth" className="text-sm font-medium text-slate-600 shrink-0">Ritmo diario de:</label>
+            <SelectNative id="targetMonth" name="targetMonth" defaultValue={selectedTargetMonth} className="bg-slate-50 border-slate-200 text-sm py-2 sm:w-48">
               {monthOptions.map(m => (
                 <option key={m.value} value={m.value}>{m.label}</option>
               ))}

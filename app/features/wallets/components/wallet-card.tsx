@@ -16,7 +16,7 @@ export function WalletCard({ name, type, balance, initialBalance, isLiability = 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{typeLabels[type] || type}</p>
-      <h3 className="mt-2 text-lg font-semibold tracking-tight text-slate-900">{name}</h3>
+      <h2 className="mt-2 text-lg font-semibold tracking-tight text-slate-900">{name}</h2>
       <div className="mt-4 flex flex-col gap-1">
         {initialBalance !== undefined && (
           <p className="text-xs font-medium text-slate-500">

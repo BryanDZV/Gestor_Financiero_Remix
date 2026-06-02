@@ -77,8 +77,9 @@ export function CurrencyConverter({ snapshot, options, onRefresh, lastUpdatedLab
       <CardContent className="space-y-6">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto_1fr] lg:items-end">
           <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Monto</label>
+            <label htmlFor="amount" className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Monto</label>
             <Input
+              id="amount"
               type="number"
               min="0"
               step="0.01"
@@ -94,6 +95,7 @@ export function CurrencyConverter({ snapshot, options, onRefresh, lastUpdatedLab
               variant="outline"
               onClick={swapCurrencies}
               className="rounded-full border-slate-200 bg-white text-slate-700"
+              aria-label="Invertir monedas"
             >
               <ArrowRightLeft className="size-4" />
             </Button>
@@ -101,8 +103,8 @@ export function CurrencyConverter({ snapshot, options, onRefresh, lastUpdatedLab
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">De</label>
-              <SelectNative value={fromCurrency} onChange={(event) => setFromCurrency(event.target.value)}>
+              <label htmlFor="from_currency" className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">De</label>
+              <SelectNative id="from_currency" value={fromCurrency} onChange={(event) => setFromCurrency(event.target.value)}>
                 {orderedOptions.map((option) => (
                   <option key={option.code} value={option.code}>
                     {option.code} - {option.name}
@@ -111,8 +113,8 @@ export function CurrencyConverter({ snapshot, options, onRefresh, lastUpdatedLab
               </SelectNative>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">A</label>
-              <SelectNative value={toCurrency} onChange={(event) => setToCurrency(event.target.value)}>
+              <label htmlFor="to_currency" className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">A</label>
+              <SelectNative id="to_currency" value={toCurrency} onChange={(event) => setToCurrency(event.target.value)}>
                 {orderedOptions.map((option) => (
                   <option key={option.code} value={option.code}>
                     {option.code} - {option.name}

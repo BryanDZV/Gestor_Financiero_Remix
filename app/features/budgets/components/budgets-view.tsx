@@ -111,13 +111,13 @@ export function BudgetsView({ userEmail, budgets, currencyOptions = ["EUR", "USD
                   <Input type="text" name="name" placeholder="Ej. Ocio, Restaurantes..." value={formName} onChange={(e) => setFormName(e.target.value)} required />
 
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-slate-500">Límite mensual (0 = Sin límite)</label>
-                    <Input type="number" step="0.01" name="monthly_limit" value={formMonthlyLimit} onChange={(e) => setFormMonthlyLimit(e.target.value)} min={0} required className="tabular-nums" />
+                    <label htmlFor="monthly_limit" className="text-xs font-medium text-slate-500">Límite mensual (0 = Sin límite)</label>
+                    <Input id="monthly_limit" type="number" step="0.01" name="monthly_limit" value={formMonthlyLimit} onChange={(e) => setFormMonthlyLimit(e.target.value)} min={0} required className="tabular-nums" />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-slate-500">Moneda</label>
-                    <CurrencySelect name="currency" value={formCurrency} onChange={(e) => setFormCurrency(e.target.value)} options={currencyOptions} />
+                    <label htmlFor="currency" className="text-xs font-medium text-slate-500">Moneda</label>
+                    <CurrencySelect id="currency" name="currency" value={formCurrency} onChange={(e) => setFormCurrency(e.target.value)} options={currencyOptions} />
                   </div>
                   <input type="hidden" name="name" value={formName} />
                   <input type="hidden" name="monthly_limit" value={formMonthlyLimit} />

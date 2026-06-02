@@ -73,8 +73,8 @@ export function CategoriesView({ userEmail, categories }: CategoriesViewProps) {
                     <label className="text-xs font-medium text-slate-500">Icono</label>
                     <div className="flex flex-wrap gap-2">
                       {ICON_OPTIONS.map((icon) => (
-                        <label key={icon} className="cursor-pointer">
-                          <input type="radio" name="icon" value={icon} className="peer sr-only" defaultChecked={icon === "ph:tag-duotone"} />
+                      <label key={icon} htmlFor={`icon-${icon}`} className="cursor-pointer">
+                        <input id={`icon-${icon}`} type="radio" name="icon" value={icon} className="peer sr-only" defaultChecked={icon === "ph:tag-duotone"} />
                           <div className="rounded-xl border border-slate-200 p-2 text-slate-400 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 transition-colors hover:bg-slate-50">
                             <Icon icon={icon} className="size-5" />
                           </div>
@@ -105,7 +105,7 @@ export function CategoriesView({ userEmail, categories }: CategoriesViewProps) {
                       <CardContent className="flex flex-col items-center justify-center p-6 text-center cursor-pointer">
                         {isDeleteMode && isSelected && (<div className="absolute right-2 top-2 flex size-5 items-center justify-center rounded-md border-2 border-red-500 bg-red-500 text-white"><Icon icon="ph:check-bold" className="size-3" /></div>)}
                         <div className="mb-3 rounded-2xl bg-slate-100 p-3 text-slate-600"><Icon icon={cat.icon || "ph:tag-duotone"} className="size-8" /></div>
-                        <h3 className="text-sm font-medium text-slate-900 line-clamp-2">{cat.name}</h3>
+                    <h2 className="text-sm font-medium text-slate-900 line-clamp-2">{cat.name}</h2>
                       </CardContent>
                     </Card>
                   );

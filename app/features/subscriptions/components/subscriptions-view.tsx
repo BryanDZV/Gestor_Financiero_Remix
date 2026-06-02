@@ -91,7 +91,7 @@ export function SubscriptionsView({ userEmail, subscriptions, wallets }: Subscri
                 {monthlyCostsByCurrency.map(({ currency, total }) => (
                   <div key={currency}>
                     <p className="text-4xl font-bold tracking-tight">{formatMoney(total, currency)}</p>
-                    <p className="mt-1 text-xs text-indigo-200">Equivale a {formatMoney(total * 12, currency)} al año</p>
+                    <p className="mt-1 text-xs text-indigo-100">Equivale a {formatMoney(total * 12, currency)} al año</p>
                   </div>
                 ))}
               </div>
@@ -108,25 +108,32 @@ export function SubscriptionsView({ userEmail, subscriptions, wallets }: Subscri
                   <FormError error={actionData?.error} />
                   <input type="hidden" name="_intent" value="create_subscription" />
                   
-                  <Input type="text" name="name" placeholder="Ej. Netflix, Gimnasio..." required />
-                  <Input type="number" step="0.01" name="amount" placeholder="Costo (Ej. 15.99)" required className="tabular-nums" />
+                  <div className="space-y-1">
+                    <label htmlFor="name" className="text-xs font-medium text-slate-500">Nombre del servicio</label>
+                    <Input id="name" type="text" name="name" placeholder="Ej. Netflix, Gimnasio..." required />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label htmlFor="amount" className="text-xs font-medium text-slate-500">Costo</label>
+                    <Input id="amount" type="number" step="0.01" name="amount" placeholder="Ej. 15.99" required className="tabular-nums" />
+                  </div>
                   
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-slate-500">Frecuencia de cobro</label>
-                    <SelectNative name="billing_period">
+                    <label htmlFor="billing_period" className="text-xs font-medium text-slate-500">Frecuencia de cobro</label>
+                    <SelectNative id="billing_period" name="billing_period">
                       <option value="monthly">Mensual</option>
                       <option value="yearly">Anual</option>
                     </SelectNative>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-slate-500">Fecha del primer cobro</label>
-                    <Input type="date" name="start_date" defaultValue={new Date().toISOString().split('T')[0]} required />
+                    <label htmlFor="start_date" className="text-xs font-medium text-slate-500">Fecha del primer cobro</label>
+                    <Input id="start_date" type="date" name="start_date" defaultValue={new Date().toISOString().split('T')[0]} required />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-slate-500">Cuenta de cobro (Opcional)</label>
-                    <SelectNative name="wallet_id">
+                    <label htmlFor="wallet_id" className="text-xs font-medium text-slate-500">Cuenta de cobro (Opcional)</label>
+                    <SelectNative id="wallet_id" name="wallet_id">
                       <option value="">Ninguna en específico</option>
                       {wallets.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
                     </SelectNative>

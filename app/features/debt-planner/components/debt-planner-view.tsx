@@ -83,26 +83,26 @@ export function DebtPlannerView({ userEmail, currencyOptions = ["EUR", "USD", "G
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Saldo Total Deudor</label>
-                <Input type="number" step="0.01" placeholder="Ej. 10000.00" value={debtAmount} onChange={(e) => setDebtAmount(e.target.value ? Number(e.target.value) : "")} className="tabular-nums font-medium text-lg border-slate-200 focus-visible:ring-indigo-500/20" />
+                <label htmlFor="debtAmount" className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Saldo Total Deudor</label>
+                <Input id="debtAmount" type="number" step="0.01" placeholder="Ej. 10000.00" value={debtAmount} onChange={(e) => setDebtAmount(e.target.value ? Number(e.target.value) : "")} className="tabular-nums font-medium text-lg border-slate-200 focus-visible:ring-indigo-500/20" />
               </div>
               <div className="space-y-2 pt-2 border-t border-slate-100">
-                <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Cuota mensual a pagar</label>
-                <Input type="number" step="0.01" placeholder="Ej. 250.00" value={monthlyPayment} onChange={(e) => setMonthlyPayment(e.target.value ? Number(e.target.value) : "")} className="tabular-nums border-slate-200 focus-visible:ring-indigo-500/20" />
+                <label htmlFor="monthlyPayment" className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Cuota mensual a pagar</label>
+                <Input id="monthlyPayment" type="number" step="0.01" placeholder="Ej. 250.00" value={monthlyPayment} onChange={(e) => setMonthlyPayment(e.target.value ? Number(e.target.value) : "")} className="tabular-nums border-slate-200 focus-visible:ring-indigo-500/20" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">T.I.N. Anual (%)</label>
-                  <Input type="number" step="0.01" placeholder="Ej. 5.5" value={interestRate} onChange={(e) => setInterestRate(e.target.value ? Number(e.target.value) : "")} className="tabular-nums border-slate-200 focus-visible:ring-indigo-500/20" />
+                  <label htmlFor="interestRate" className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">T.I.N. Anual (%)</label>
+                  <Input id="interestRate" type="number" step="0.01" placeholder="Ej. 5.5" value={interestRate} onChange={(e) => setInterestRate(e.target.value ? Number(e.target.value) : "")} className="tabular-nums border-slate-200 focus-visible:ring-indigo-500/20" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600" title="Seguros, mantenimiento, etc.">Comisiones / mes</label>
-                  <Input type="number" step="0.01" placeholder="Ej. 12.00" value={monthlyFee} onChange={(e) => setMonthlyFee(e.target.value ? Number(e.target.value) : "")} className="tabular-nums border-slate-200 focus-visible:ring-indigo-500/20" />
+                  <label htmlFor="monthlyFee" className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600" title="Seguros, mantenimiento, etc.">Comisiones / mes</label>
+                  <Input id="monthlyFee" type="number" step="0.01" placeholder="Ej. 12.00" value={monthlyFee} onChange={(e) => setMonthlyFee(e.target.value ? Number(e.target.value) : "")} className="tabular-nums border-slate-200 focus-visible:ring-indigo-500/20" />
                 </div>
               </div>
               <div className="space-y-2 pt-2 border-t border-slate-100 mt-2">
-                 <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Moneda</label>
-                 <SelectNative value={currency} onChange={(e) => setCurrency(e.target.value)}>
+                 <label htmlFor="currency" className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Moneda</label>
+                 <SelectNative id="currency" value={currency} onChange={(e) => setCurrency(e.target.value)}>
                     {currencyOptions.map(code => {
                       let label = code;
                       try {
@@ -129,7 +129,7 @@ export function DebtPlannerView({ userEmail, currencyOptions = ["EUR", "USD", "G
                 <CardContent className="p-6 flex items-start gap-4">
                   <Icon icon="ph:warning-circle-fill" className="size-8 text-red-500 shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-red-900">Cuota insuficiente</h3>
+                    <h2 className="font-semibold text-red-900">Cuota insuficiente</h2>
                     <p className="mt-1 text-sm text-red-800">Tu cuota de <span className="font-semibold">{formatMoney(payment, currency)}</span> no alcanza para cubrir los intereses y comisiones generados este mes ({formatMoney((balance * (rate > 0 ? (rate / 100) / 12 : 0)) + fee, currency)}). La deuda seguirá creciendo mes a mes hacia el infinito.</p>
                   </div>
                 </CardContent>
@@ -140,7 +140,7 @@ export function DebtPlannerView({ userEmail, currencyOptions = ["EUR", "USD", "G
                 <CardContent className="p-8 relative z-10 space-y-8">
                   <div>
                     <p className="text-sm font-medium text-indigo-900/80 uppercase tracking-widest">Resultado de proyección</p>
-                    <h3 className="mt-2 text-5xl font-bold tracking-tight text-indigo-950">{monthsToPay} {monthsToPay === 1 ? 'mes' : 'meses'}</h3>
+                    <h2 className="mt-2 text-5xl font-bold tracking-tight text-indigo-950">{monthsToPay} {monthsToPay === 1 ? 'mes' : 'meses'}</h2>
                     <p className="mt-3 flex items-center text-base font-medium text-indigo-700"><Icon icon="ph:calendar-check-duotone" className="mr-2 size-6" /> Serás libre de esta deuda en {projectedMonth}</p>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-indigo-200/60 pt-6">
