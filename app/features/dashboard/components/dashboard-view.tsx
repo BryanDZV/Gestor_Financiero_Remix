@@ -5,10 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { formatMoney, formatDate } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { TransactionAmount } from "~/components/ui/transaction-amount";
+import { usePrivacy } from "~/hooks/use-privacy";
+import { PrivacyBlur } from "~/components/ui/privacy-blur";
 import type { DashboardViewProps } from "~/types";
 
 export function DashboardView({ userEmail, wallets, transactions }: DashboardViewProps) {
   const [showTransactions, setShowTransactions] = useState(false);
+  const { isPrivate, togglePrivacy } = usePrivacy();
 
   // Calculamos el patrimonio separado por moneda USE MEMO
   const totalsByCurrency = useMemo(() => {
@@ -31,9 +34,12 @@ export function DashboardView({ userEmail, wallets, transactions }: DashboardVie
   return (
     <DashboardLayout userEmail={userEmail}>
       <div className="mx-auto max-w-6xl space-y-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        <header className="border-b border-slate-200 pb-6">
+        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-6 gap-4">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Resumen General</h1>
-          
+          <Button variant="outline" onClick={togglePrivacy} className="w-full sm:w-auto rounded-xl bg-white text-slate-700">
+            <Icon icon={isPrivate ? "ph:eye-slash-duotone" : "ph:eye-duotone"} className="size-5 mr-2" />
+            {isPrivate ? "Mostrar saldos" : "Ocultar saldos"}
+          </Button>
         </header>
 
         {/* TARJETAS DE PATRIMONIO POR MONEDA */}
@@ -60,19 +66,19 @@ export function DashboardView({ userEmail, wallets, transactions }: DashboardVie
                         </span>
                       </p>
                       <h2 className={`text-4xl sm:text-5xl font-bold tracking-tight ${netWorth < 0 ? 'text-red-600' : 'text-slate-900'}`}>
-                        {formatMoney(netWorth, currency)}
+                        <PrivacyBlur>{formatMoney(netWorth, currency)}</PrivacyBlur>
                       </h2>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-2xl bg-slate-50 p-4 border border-slate-100">
                       <div>
                         <p className="text-xs font-medium text-slate-500 flex items-center gap-1.5 uppercase tracking-wider mb-1"><Icon icon="ph:wallet-duotone" className="size-4 text-emerald-500" /> Liquidez Total</p>
-                        <p className="text-xl font-semibold text-slate-800">{formatMoney(assets, currency)}</p>
+                        <p className="text-xl font-semibold text-slate-800"><PrivacyBlur>{formatMoney(assets, currency)}</PrivacyBlur></p>
                       </div>
                       <div className="w-px h-8 bg-slate-200 hidden sm:block"></div>
                       <div>
                         <p className="text-xs font-medium text-slate-500 flex items-center gap-1.5 uppercase tracking-wider mb-1"><Icon icon="ph:credit-card-duotone" className="size-4 text-red-500" /> Deuda Total</p>
-                        <p className="text-xl font-semibold text-slate-800">{formatMoney(liabilities, currency)}</p>
+                        <p className="text-xl font-semibold text-slate-800"><PrivacyBlur>{formatMoney(liabilities, currency)}</PrivacyBlur></p>
                       </div>
                     </div>
                   </div>
@@ -101,7 +107,9 @@ export function DashboardView({ userEmail, wallets, transactions }: DashboardVie
                     </div>
                     <Icon icon={w.is_liability ? "ph:credit-card-duotone" : "ph:wallet-duotone"} className={`size-6 shrink-0 ${w.is_liability ? 'text-red-500' : 'text-emerald-500'}`} />
                   </div>
-                  <p className="mt-4 text-2xl font-bold tracking-tight text-slate-800">{formatMoney(w.current_balance, w.currency)}</p>
+                  <p className="mt-4 text-2xl font-bold tracking-tight text-slate-800">
+                    <PrivacyBlur>{formatMoney(w.current_balance, w.currency)}</PrivacyBlur>
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -152,7 +160,9 @@ export function DashboardView({ userEmail, wallets, transactions }: DashboardVie
                             )}
                           </div>
                         </div>
-                        <TransactionAmount amount={tx.amount} type={tx.type} currency={tx.wallets?.currency} className="text-sm text-left sm:text-right" />
+                        <PrivacyBlur>
+                          <TransactionAmount amount={tx.amount} type={tx.type} currency={tx.wallets?.currency} className="text-sm text-left sm:text-right" />
+                        </PrivacyBlur>
                       </li>
                     ))}
                   </ul>

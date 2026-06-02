@@ -1,10 +1,18 @@
 // app/routes/dashboard.tsx
 import { data, redirect, useLoaderData } from "react-router";
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
+import type { LoaderFunctionArgs, ActionFunctionArgs, MetaFunction } from "react-router";
 import { getSupabase } from "~/utils/supabase.server";
 import { DashboardView } from "~/features/dashboard/components/dashboard-view";
 import { mapRawWallets } from "~/utils/wallets.server";
+import { PrivacyProvider } from "~/hooks/use-privacy";
 import type { DashboardWallet, DashboardTransaction } from "~/types";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Resumen General | Finanzas Pro" },
+    { name: "description", content: "Visualiza tu patrimonio neto, liquidez y resumen de gastos diarios en tiempo real." },
+  ];
+};
 
 // (Loader y Action se mantienen exactamente igual, la seguridad no cambia)
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -14,8 +22,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (error || !user) throw redirect("/login", { headers });
 
   const [walletsResponse, transactionsResponse] = await Promise.all([
-    supabase.from('wallets').select("*, transactions!transactions_wallet_id_fkey(amount, type)").order('created_at', { ascending: true }),
-    supabase.from('transactions').select('id, concept, amount, type, date, wallets(name, currency)').order('date', { ascending: false }).limit(10)
+    supabase.from('wallets').select("*, transactions!transactions_wallet_id_fkey(amount, type)").eq('user_id', user.id).order('created_at', { ascending: true }),
+    supabase.from('transactions').select('id, concept, amount, type, date, wallets!transactions_wallet_id_fkey(name, currency)').eq('user_id', user.id).order('date', { ascending: false }).limit(10)
   ]);
 
   const rawWallets = walletsResponse.data || [];
@@ -55,5 +63,9 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function DashboardRoute() {
   const { user, wallets, transactions } = useLoaderData<typeof loader>();
 
-  return <DashboardView userEmail={user.email || ""} wallets={wallets} transactions={transactions} />;
+  return (
+    <PrivacyProvider namespace="dashboard">
+      <DashboardView userEmail={user.email || ""} wallets={wallets} transactions={transactions} />
+    </PrivacyProvider>
+  );
 }
