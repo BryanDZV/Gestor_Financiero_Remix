@@ -40,10 +40,10 @@ export function AlertCenterPanel({ alerts, unreadCount, isOpen, onToggle, onClea
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-base">Centro de alertas</CardTitle>
               <div className="flex items-center gap-2">
-                <Button type="button" variant="ghost" size="icon" className="size-8" onClick={onClearAll} title="Borrar historial">
+                <Button type="button" variant="ghost" size="icon" className="size-8" onClick={onClearAll} title="Borrar historial" aria-label="Borrar historial de alertas">
                   <Trash2 className="size-4 text-slate-500" />
                 </Button>
-                <Button type="button" variant="ghost" size="icon" className="size-8" onClick={onToggle} title="Cerrar panel">
+                <Button type="button" variant="ghost" size="icon" className="size-8" onClick={onToggle} title="Cerrar panel" aria-label="Cerrar panel de alertas">
                   <X className="size-4 text-slate-500" />
                 </Button>
               </div>
@@ -71,6 +71,7 @@ export function AlertCenterPanel({ alerts, unreadCount, isOpen, onToggle, onClea
                         className="size-7"
                         onClick={() => onDismissAlert(alert.id)}
                         title="Descartar alerta"
+                        aria-label="Descartar alerta"
                       >
                         <X className="size-3.5 text-slate-500" />
                       </Button>

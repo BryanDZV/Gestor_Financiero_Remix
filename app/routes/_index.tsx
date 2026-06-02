@@ -1,7 +1,14 @@
 import { redirect } from "react-router";
-import type { LoaderFunctionArgs } from "react-router";
+import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 import { getSupabase } from "~/utils/supabase.server";
 import { LandingView } from "~/features/landing/components/landing-view";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Finanzas Pro | Tu gestor financiero personal" },
+    { name: "description", content: "Toma el control de tus cuentas, presupuestos y patrimonio de forma segura con Finanzas Pro." },
+  ];
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabase(request);

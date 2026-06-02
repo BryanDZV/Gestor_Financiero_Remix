@@ -76,7 +76,7 @@ export function DashboardLayout({ userEmail, children }: DashboardLayoutProps) {
             </div>
 
             <Form method="post" action="/dashboard">
-              <Button variant="outline" type="submit" size="sm" className="rounded-full border-slate-200 px-3">
+              <Button variant="outline" type="submit" size="sm" className="rounded-full border-slate-200 px-3" aria-label="Cerrar sesión">
                 <LogOut className="size-4" />
               </Button>
             </Form>
