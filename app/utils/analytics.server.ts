@@ -45,7 +45,19 @@ export async function getAnalyticsData(userId: string, supabase: SupabaseClient,
   });
 
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1', '#14b8a6'];
-  const categoryData = Object.entries(categoryMap).map(([name, amount], index) => ({ name, amount, color: COLORS[index % COLORS.length] })).sort((a, b) => b.amount - a.amount).slice(0, 8); // Top 8 categorías
+  
+  let categoryEntries = Object.entries(categoryMap);
+  
+  // Si hay gastos con categoría, filtramos los "Sin categoría" para que no opaquen el gráfico
+  const hasCategorized = categoryEntries.some(([name]) => name !== 'Sin categoría');
+  if (hasCategorized) {
+    categoryEntries = categoryEntries.filter(([name]) => name !== 'Sin categoría');
+  }
+
+  const categoryData = categoryEntries
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([name, amount], index) => ({ name, amount, color: COLORS[index % COLORS.length] }));
 
   const monthlyDataList = Object.values(monthlyMap).map(m => ({
     ...m,

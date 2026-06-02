@@ -95,7 +95,7 @@ export function AnalyticsView({ userEmail, monthlyData, categoryData, dailyData,
 
           {/* Gráfico de Pastel: Gastos por Categoría */}
           <Card className="lg:col-span-1">
-            <CardHeader><CardTitle>Top Gastos por Categoría</CardTitle><CardDescription>Distribución de tu dinero en los últimos {selectedMonthsCount} meses.</CardDescription></CardHeader>
+            <CardHeader><CardTitle>Top Gastos por Categoría</CardTitle><CardDescription>Distribución de tus gastos clasificados en los últimos {selectedMonthsCount} meses.</CardDescription></CardHeader>
             <CardContent className="h-75 min-h-75 w-full min-w-0">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
