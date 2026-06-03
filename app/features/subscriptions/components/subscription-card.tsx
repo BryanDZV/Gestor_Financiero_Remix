@@ -14,7 +14,7 @@ export function SubscriptionCard({ subscription, isDeleteMode, isSelected, onTog
         "relative transition-all",
         isDeleteMode && "cursor-pointer",
         isDeleteMode && isSelected && "ring-2 ring-red-500",
-        !subscription.active && !isDeleteMode && "opacity-60 bg-slate-50"
+        !subscription.active && !isDeleteMode && "opacity-60 bg-muted/50"
       )}
     >
       {isDeleteMode && (
@@ -26,8 +26,8 @@ export function SubscriptionCard({ subscription, isDeleteMode, isSelected, onTog
       <CardContent className="p-5 flex flex-col h-full justify-between gap-4">
         <div className="flex justify-between items-start gap-4 pr-6">
           <div>
-            <h3 className="font-semibold text-slate-900 line-clamp-1">{subscription.name}</h3>
-            <p className="text-sm font-medium text-slate-500 mt-1">
+            <h3 className="font-semibold text-foreground line-clamp-1">{subscription.name}</h3>
+            <p className="text-sm font-medium text-muted-foreground mt-1">
               {subscription.billing_period === 'yearly' ? 'Facturación Anual' : 'Facturación Mensual'}
               {subscription.start_date && ` • Desde: ${formatDate(subscription.start_date)}`}
               {subscription.wallets?.name && (
@@ -42,8 +42,8 @@ export function SubscriptionCard({ subscription, isDeleteMode, isSelected, onTog
           </Badge>
         </div>
         
-        <div className="flex items-end justify-between border-t border-slate-100 pt-4">
-          <p className="text-2xl font-bold tracking-tight text-slate-800">
+        <div className="flex items-end justify-between border-t border-border pt-4">
+          <p className="text-2xl font-bold tracking-tight text-foreground">
             {formatMoney(subscription.amount, subscription.wallets?.currency)}
           </p>
           {!isDeleteMode && (

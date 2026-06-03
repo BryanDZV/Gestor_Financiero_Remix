@@ -64,12 +64,12 @@ export function CurrencyConverter({ snapshot, options, onRefresh, lastUpdatedLab
             <TrendingUp className="size-5 text-blue-600" />
             Conversor en vivo
           </CardTitle>
-          <Button variant="outline" type="button" onClick={onRefresh} className="rounded-xl border-slate-200 bg-white text-slate-700">
+          <Button variant="outline" type="button" onClick={onRefresh} className="rounded-xl border-border bg-background text-foreground hover:bg-muted">
             <RefreshCw className="mr-2 size-4" />
             Actualizar tasas
           </Button>
         </div>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           Tasas obtenidas desde la API pública de Frankfurter. Última actualización: {lastUpdatedLabel}.
         </p>
       </CardHeader>
@@ -77,7 +77,7 @@ export function CurrencyConverter({ snapshot, options, onRefresh, lastUpdatedLab
       <CardContent className="space-y-6">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto_1fr] lg:items-end">
           <div className="space-y-2">
-            <label htmlFor="amount" className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Monto</label>
+            <label htmlFor="amount" className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Monto</label>
             <Input
               id="amount"
               type="number"
@@ -94,7 +94,7 @@ export function CurrencyConverter({ snapshot, options, onRefresh, lastUpdatedLab
               type="button"
               variant="outline"
               onClick={swapCurrencies}
-              className="rounded-full border-slate-200 bg-white text-slate-700"
+              className="rounded-full border-border bg-background text-foreground hover:bg-muted"
               aria-label="Invertir monedas"
             >
               <ArrowRightLeft className="size-4" />
@@ -103,7 +103,7 @@ export function CurrencyConverter({ snapshot, options, onRefresh, lastUpdatedLab
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label htmlFor="from_currency" className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">De</label>
+              <label htmlFor="from_currency" className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">De</label>
               <SelectNative id="from_currency" value={fromCurrency} onChange={(event) => setFromCurrency(event.target.value)}>
                 {orderedOptions.map((option) => (
                   <option key={option.code} value={option.code}>
@@ -113,7 +113,7 @@ export function CurrencyConverter({ snapshot, options, onRefresh, lastUpdatedLab
               </SelectNative>
             </div>
             <div className="space-y-2">
-              <label htmlFor="to_currency" className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">A</label>
+              <label htmlFor="to_currency" className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">A</label>
               <SelectNative id="to_currency" value={toCurrency} onChange={(event) => setToCurrency(event.target.value)}>
                 {orderedOptions.map((option) => (
                   <option key={option.code} value={option.code}>
@@ -125,12 +125,12 @@ export function CurrencyConverter({ snapshot, options, onRefresh, lastUpdatedLab
           </div>
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Resultado</p>
-            <p className="mt-3 text-4xl font-semibold tracking-tight text-slate-900 tabular-nums">
+      <div className="rounded-3xl border border-border bg-muted/50 p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Resultado</p>
+          <p className="mt-3 text-4xl font-semibold tracking-tight text-foreground tabular-nums">
               {convertedAmount === null ? "--" : formatMoney(convertedAmount, toCurrency)}
             </p>
-            <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-muted-foreground">
               {pairRate === null
                 ? "No se pudo calcular la conversión con las tasas disponibles."
                 : `1 ${fromCurrency} = ${pairRate.toFixed(6)} ${toCurrency}`}

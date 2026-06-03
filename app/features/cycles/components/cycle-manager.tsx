@@ -65,17 +65,17 @@ export function CycleManager({ activeCycles, isSubmitting, shareDivisor = 1, cat
   return (
     <div className="space-y-6">
       {(!hasActiveCycles || showNewCycle) ? (
-        <Card className="border-indigo-100 bg-indigo-50/50 shadow-sm">
+        <Card className="border-indigo-100 dark:border-indigo-500/20 bg-indigo-50/50 dark:bg-indigo-500/10 shadow-sm">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="flex items-center gap-2 text-base text-indigo-900">
-                  <Icon icon="ph:calendar-plus-duotone" className="size-5 text-indigo-600" /> Abrir ciclo
+                <CardTitle className="flex items-center gap-2 text-base text-indigo-900 dark:text-indigo-300">
+                  <Icon icon="ph:calendar-plus-duotone" className="size-5 text-indigo-600 dark:text-indigo-400" /> Abrir ciclo
                 </CardTitle>
-                <CardDescription className="text-indigo-700/70">Crea un periodo para registrar ingresos y gastos.</CardDescription>
+                <CardDescription className="text-indigo-700/70 dark:text-indigo-300/70">Crea un periodo para registrar ingresos y gastos.</CardDescription>
               </div>
               {hasActiveCycles && (
-                <Button variant="ghost" size="sm" onClick={() => setShowNewCycle(false)} className="h-8 w-8 p-0 rounded-full hover:bg-indigo-100 text-indigo-600">
+                <Button variant="ghost" size="sm" onClick={() => setShowNewCycle(false)} className="h-8 w-8 p-0 rounded-full hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
                   <Icon icon="ph:x" className="size-4" />
                 </Button>
               )}
@@ -84,8 +84,8 @@ export function CycleManager({ activeCycles, isSubmitting, shareDivisor = 1, cat
           <CardContent>
             <Form method="post" className="space-y-4">
               <input type="hidden" name="_intent" value="create_cycle" />
-              <Input type="text" name="name" placeholder="Ej. Junio 2026" required className="bg-white" />
-              <Input type="date" name="start_date" required className="bg-white" />
+              <Input type="text" name="name" placeholder="Ej. Junio 2026" required className="bg-background" />
+              <Input type="date" name="start_date" required className="bg-background" />
               <SubmitButton isSubmitting={isSubmitting} loadingText="Iniciando..." className="bg-indigo-600 hover:bg-indigo-700">
                 Iniciar ciclo
               </SubmitButton>
@@ -93,7 +93,7 @@ export function CycleManager({ activeCycles, isSubmitting, shareDivisor = 1, cat
           </CardContent>
         </Card>
       ) : (
-        <Button variant="outline" onClick={() => setShowNewCycle(true)} className="w-full border-dashed border-slate-300 text-slate-500 bg-slate-50/50 hover:bg-slate-100 hover:text-slate-900 transition-colors shadow-sm">
+        <Button variant="outline" onClick={() => setShowNewCycle(true)} className="w-full border-dashed border-border text-muted-foreground bg-muted/50 hover:bg-muted hover:text-foreground transition-colors shadow-sm">
           <Icon icon="ph:plus-circle-duotone" className="mr-2 size-4" /> Abrir otro ciclo simultáneo
         </Button>
       )}
@@ -101,7 +101,7 @@ export function CycleManager({ activeCycles, isSubmitting, shareDivisor = 1, cat
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between gap-3">
-            <CardTitle className="text-base text-emerald-700">Registrar Movimientos</CardTitle>
+            <CardTitle className="text-base text-emerald-700 dark:text-emerald-400">Registrar Movimientos</CardTitle>
             {hasActiveCycles && <Badge variant="success">En curso ({activeCycles.length})</Badge>}
           </div>
           <CardDescription>Sube un archivo o añade movimientos a tus periodos.</CardDescription>
@@ -121,11 +121,11 @@ export function CycleManager({ activeCycles, isSubmitting, shareDivisor = 1, cat
             <Form ref={formRef} method="post" encType="multipart/form-data" className="space-y-4 pt-2">
               <input type="hidden" name="_intent" value="import_file" />
               
-              <div className="space-y-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-                <Icon icon="ph:file-arrow-up-duotone" className="mx-auto size-8 text-slate-400" />
-                <div className="text-sm font-medium text-slate-700">Sube el extracto de tu banco</div>
-                <p className="text-xs text-slate-500">Los periodos (meses) se crearán solos según la fecha de cada movimiento.</p>
-                <Input type="file" name="file" accept=".csv, .xls, .xlsx, .ofx, .qif" required className="mx-auto mt-4 w-full max-w-62.5 text-xs file:bg-slate-100 file:text-slate-700 file:border-0 file:rounded-md file:px-2 file:py-1" />
+              <div className="space-y-2 rounded-xl border border-dashed border-border bg-muted/50 p-6 text-center">
+                <Icon icon="ph:file-arrow-up-duotone" className="mx-auto size-8 text-muted-foreground" />
+                <div className="text-sm font-medium text-foreground">Sube el extracto de tu banco</div>
+                <p className="text-xs text-muted-foreground">Los periodos (meses) se crearán solos según la fecha de cada movimiento.</p>
+                <Input type="file" name="file" accept=".csv, .xls, .xlsx, .ofx, .qif" required className="mx-auto mt-4 w-full max-w-62.5 text-xs file:bg-secondary file:text-secondary-foreground file:border-0 file:rounded-md file:px-2 file:py-1" />
               </div>
               
               <SubmitButton isSubmitting={isSubmitting} loadingText="Importando..." className="bg-emerald-600 hover:bg-emerald-700">
@@ -141,7 +141,7 @@ export function CycleManager({ activeCycles, isSubmitting, shareDivisor = 1, cat
                   <input type="hidden" name="cycle_id" value={activeCycles[0].id} />
                 ) : (
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-slate-500">¿A qué ciclo pertenece?</label>
+                    <label className="text-xs font-medium text-muted-foreground">¿A qué ciclo pertenece?</label>
                     <SelectNative name="cycle_id" required>
                       {activeCycles.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </SelectNative>
@@ -158,15 +158,15 @@ export function CycleManager({ activeCycles, isSubmitting, shareDivisor = 1, cat
 
                 {txType === "transfer" && (
                   <div className="space-y-1 animate-in fade-in slide-in-from-top-1">
-                    <label className="text-xs font-medium text-slate-500">¿A qué cuenta enviarás el dinero?</label>
+                    <label className="text-xs font-medium text-muted-foreground">¿A qué cuenta enviarás el dinero?</label>
                     <SelectNative name="destination_wallet_id" required value={destWalletId} onChange={(e) => setDestWalletId(e.target.value)}>
                       <option value="">Selecciona la cuenta destino...</option>
                       {otherWallets.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
                     </SelectNative>
                     
                     {isDifferentCurrency && (
-                      <div className="mt-2 flex items-center gap-3 rounded-xl bg-indigo-50/50 border border-indigo-100 px-3 py-2 text-sm text-indigo-700 animate-in fade-in">
-                        <Icon icon="ph:currency-circle-dollar-duotone" className="size-5 shrink-0 text-indigo-500" />
+                      <div className="mt-2 flex items-center gap-3 rounded-xl bg-indigo-50/50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 px-3 py-2 text-sm text-indigo-700 dark:text-indigo-400 animate-in fade-in">
+                        <Icon icon="ph:currency-circle-dollar-duotone" className="size-5 shrink-0 text-indigo-500 dark:text-indigo-400" />
                         <div>
                           <span className="font-semibold">
                             {Number(amount) > 0 ? formatMoney(convertedAmount, destCurrency) : "Conversión de moneda"}
@@ -196,8 +196,8 @@ export function CycleManager({ activeCycles, isSubmitting, shareDivisor = 1, cat
                 
                 {shareDivisor > 1 && (
                   <div className="flex items-center gap-2 px-1 py-1">
-                    <input type="checkbox" id="apply_division" name="apply_division" value="true" defaultChecked className="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
-                    <label htmlFor="apply_division" className="text-sm font-medium text-slate-700">
+                    <input type="checkbox" id="apply_division" name="apply_division" value="true" defaultChecked className="size-4 rounded border-input text-blue-600 focus:ring-blue-500" />
+                    <label htmlFor="apply_division" className="text-sm font-medium text-foreground">
                       Dividir automáticamente entre {shareDivisor} personas
                     </label>
                   </div>
@@ -209,8 +209,8 @@ export function CycleManager({ activeCycles, isSubmitting, shareDivisor = 1, cat
               </Form>
             ) : (
               <div className="py-6 text-center">
-                <p className="text-sm font-medium text-slate-600 mb-2">No hay ciclos activos</p>
-                <p className="text-xs text-slate-500 mb-4">Abre un ciclo para añadir movimientos manualmente, o simplemente sube un CSV.</p>
+                <p className="text-sm font-medium text-foreground mb-2">No hay ciclos activos</p>
+                <p className="text-xs text-muted-foreground mb-4">Abre un ciclo para añadir movimientos manualmente, o simplemente sube un CSV.</p>
               </div>
             )
           )}

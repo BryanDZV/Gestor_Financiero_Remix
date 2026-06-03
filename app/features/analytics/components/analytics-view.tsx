@@ -14,8 +14,8 @@ export function AnalyticsView({ userEmail, monthlyData, categoryData, dailyData,
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-lg">
-          <p className="mb-2 font-semibold text-slate-700">{label}</p>
+        <div className="rounded-xl border border-border bg-popover text-popover-foreground p-4 shadow-lg">
+          <p className="mb-2 font-semibold">{label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm font-medium" style={{ color: entry.color === '#3b82f6' ? '#2563eb' : entry.color }}>
               {entry.name === 'income' ? 'Ingresos' : 
@@ -48,9 +48,9 @@ export function AnalyticsView({ userEmail, monthlyData, categoryData, dailyData,
         </header>
 
         {/* Controles de Filtros */}
-        <Form method="get" className="flex flex-wrap gap-4 items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm" onChange={(e) => submit(e.currentTarget)}>
+        <Form method="get" className="flex flex-wrap gap-4 items-center bg-card p-4 rounded-2xl border border-border shadow-sm text-card-foreground" onChange={(e) => submit(e.currentTarget)}>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <label htmlFor="monthsCount" className="text-sm font-medium text-slate-600 shrink-0">Ver historial de:</label>
+            <label htmlFor="monthsCount" className="text-sm font-medium text-muted-foreground shrink-0">Ver historial de:</label>
             <div className="flex items-center gap-2">
               <Input 
                 id="monthsCount"
@@ -58,15 +58,15 @@ export function AnalyticsView({ userEmail, monthlyData, categoryData, dailyData,
                 name="monthsCount" 
                 min="1" 
                 defaultValue={selectedMonthsCount} 
-                className="bg-slate-50 border-slate-200 text-sm py-2 w-24 tabular-nums" 
+                className="bg-background border-input text-sm py-2 w-24 tabular-nums" 
               />
-              <span className="text-sm text-slate-500">meses</span>
+              <span className="text-sm text-muted-foreground">meses</span>
             </div>
           </div>
           
           <div className="flex items-center gap-3 w-full sm:w-auto sm:ml-auto">
-            <label htmlFor="targetMonth" className="text-sm font-medium text-slate-600 shrink-0">Ritmo diario de:</label>
-            <SelectNative id="targetMonth" name="targetMonth" defaultValue={selectedTargetMonth} className="bg-slate-50 border-slate-200 text-sm py-2 sm:w-48">
+            <label htmlFor="targetMonth" className="text-sm font-medium text-muted-foreground shrink-0">Ritmo diario de:</label>
+            <SelectNative id="targetMonth" name="targetMonth" defaultValue={selectedTargetMonth} className="bg-background border-input text-sm py-2 sm:w-48">
               {monthOptions.map(m => (
                 <option key={m.value} value={m.value}>{m.label}</option>
               ))}

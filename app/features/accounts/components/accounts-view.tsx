@@ -66,7 +66,7 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
   return (
     <DashboardLayout userEmail={userEmail}>
       <div className="mx-auto max-w-6xl space-y-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        <header className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
           <PageHeader 
             supertitle="Portafolio" 
             title="Mis cuentas" 
@@ -77,7 +77,7 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
             <Button 
               variant="outline" 
               onClick={togglePrivacy} 
-              className="rounded-xl border-slate-200 bg-white text-slate-700 h-10"
+              className="rounded-xl border-border bg-background text-foreground hover:bg-muted h-10"
               aria-label={isPrivate ? "Mostrar saldos" : "Ocultar saldos"}
             >
               <Icon icon={isPrivate ? "ph:eye-slash-duotone" : "ph:eye-duotone"} className="size-4 sm:mr-2" />
@@ -105,7 +105,7 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
                   setEditingWallet(null);
                 }
                 setIsDeleteMode(false); 
-              }} variant="outline" className="rounded-xl border-slate-200 bg-white text-slate-700">
+              }} variant="outline" className="rounded-xl border-border bg-background text-foreground hover:bg-muted">
                 <PlusCircle className="mr-2 size-4" />
                 {showForm && !editingWallet ? "Cancelar" : "Nueva Cuenta"}
               </Button>
@@ -114,13 +114,13 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
         </header>
 
         {showForm && (
-          <Card className="max-w-2xl border-dashed border-slate-300">
+          <Card className="max-w-2xl border-dashed border-border">
             <CardHeader>
               <CardTitle className="flex justify-between items-center">
                 <span>{editingWallet ? "Editar cuenta" : "Registrar cuenta"}</span>
                 {editingWallet && (
-                  <Button variant="ghost" size="icon" onClick={() => { setEditingWallet(null); setShowForm(false); }} className="h-8 w-8 rounded-full" aria-label="Cerrar formulario de edición">
-                    <Icon icon="ph:x" className="size-4 text-slate-500" />
+                  <Button variant="ghost" size="icon" onClick={() => { setEditingWallet(null); setShowForm(false); }} className="h-8 w-8 rounded-full text-muted-foreground hover:bg-muted" aria-label="Cerrar formulario de edición">
+                    <Icon icon="ph:x" className="size-4" />
                   </Button>
                 )}
               </CardTitle>
@@ -134,43 +134,43 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
                 <FormError error={actionData?.error} />
 
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Nombre</label>
+                  <label className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Nombre</label>
                   <Input type="text" name="name" placeholder="Ej. Tarjeta Crédito" defaultValue={editingWallet?.name} required />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Moneda</label>
+                  <label className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Moneda</label>
                   <CurrencySelect name="currency" defaultValue={editingWallet?.currency || "EUR"} options={currencyOptions} disabled={!!editingWallet} />
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Tipo</label>
+                    <label className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Tipo</label>
                     <SelectNative name="is_liability" defaultValue={editingWallet ? (editingWallet.is_liability ? "true" : "false") : "false"} disabled={!!editingWallet}>
                       <option value="false">Activo (Cuenta bancaria / Ahorro)</option>
                       <option value="true">Pasivo (Deuda real)</option>
                     </SelectNative>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Saldo inicial</label>
+                    <label className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Saldo inicial</label>
                     <Input type="number" step="0.01" name="initial_balance" defaultValue={editingWallet?.initial_balance} placeholder="0.00" required={!editingWallet} disabled={!!editingWallet} className="tabular-nums" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
+                  <label className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                     Meta de Ahorro / Deuda Total (Opcional)
                   </label>
                   <Input type="number" step="0.01" name="target_amount" defaultValue={editingWallet?.target_amount || 0} min={0} />
-                  <p className="text-xs text-slate-500">¿Cuánto quieres ahorrar o de cuánto es tu deuda total?</p>
+                  <p className="text-xs text-muted-foreground">¿Cuánto quieres ahorrar o de cuánto es tu deuda total?</p>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
+                  <label className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                     ¿Cuenta compartida? (Nº personas)
                   </label>
                   <Input type="number" name="share_divisor" defaultValue={editingWallet?.share_divisor || 1} min={1} required />
-                  <p className="text-xs text-slate-500">Deja 1 si es personal.</p>
+                  <p className="text-xs text-muted-foreground">Deja 1 si es personal.</p>
                 </div>
 
                 <SubmitButton isSubmitting={isSubmitting}>
@@ -201,7 +201,7 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
                           setShowForm(true); 
                           window.scrollTo({ top: 0, behavior: 'smooth' }); 
                         }} 
-                        className="h-8 w-8 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-slate-50 hover:text-blue-600"
+                        className="h-8 w-8 rounded-full bg-background text-muted-foreground shadow-sm border border-border hover:bg-muted hover:text-blue-600"
                         aria-label={`Editar cuenta ${wallet.name}`}
                       >
                         <Icon icon="ph:pencil-simple-duotone" className="size-4" />
@@ -253,8 +253,8 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
         {wallets.length > 0 && (
           <div className="mt-6 sm:mt-8">
             <Collapsible title="Distribución de Patrimonio Real" defaultOpen={false} className="w-full">
-              <p className="text-sm text-slate-500 mb-3">Haz clic para ver el análisis de cómo se divide tu dinero entre tus cuentas.</p>
-              <Card className="overflow-hidden border-slate-200 shadow-sm">
+              <p className="text-sm text-muted-foreground mb-3">Haz clic para ver el análisis de cómo se divide tu dinero entre tus cuentas.</p>
+              <Card className="overflow-hidden border-border shadow-sm">
                 <CardContent className="p-6">
                   <div className="h-64 w-full min-w-0">
                     {portfolioChartData.length > 0 ? (
@@ -268,7 +268,7 @@ export function AccountsView({ userEmail, wallets, currencyOptions = ["EUR", "US
                         </PieChart>
                       </ResponsiveContainer>
                     ) : (
-                      <div className="flex h-full items-center justify-center text-sm text-slate-500">No hay saldos configurados para mostrar.</div>
+                      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">No hay saldos configurados para mostrar.</div>
                     )}
                   </div>
                 </CardContent>

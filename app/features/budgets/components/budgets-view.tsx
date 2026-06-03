@@ -59,7 +59,7 @@ export function BudgetsView({ userEmail, budgets, currencyOptions = ["EUR", "USD
   return (
     <DashboardLayout userEmail={userEmail}>
       <div className="mx-auto max-w-6xl space-y-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        <header className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
           <PageHeader 
             supertitle="Categorías" 
             title="Presupuestos" 
@@ -111,12 +111,12 @@ export function BudgetsView({ userEmail, budgets, currencyOptions = ["EUR", "USD
                   <Input type="text" name="name" placeholder="Ej. Ocio, Restaurantes..." value={formName} onChange={(e) => setFormName(e.target.value)} required />
 
                   <div className="space-y-1">
-                    <label htmlFor="monthly_limit" className="text-xs font-medium text-slate-500">Límite mensual (0 = Sin límite)</label>
+                    <label htmlFor="monthly_limit" className="text-xs font-medium text-muted-foreground">Límite mensual (0 = Sin límite)</label>
                     <Input id="monthly_limit" type="number" step="0.01" name="monthly_limit" value={formMonthlyLimit} onChange={(e) => setFormMonthlyLimit(e.target.value)} min={0} required className="tabular-nums" />
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="currency" className="text-xs font-medium text-slate-500">Moneda</label>
+                    <label htmlFor="currency" className="text-xs font-medium text-muted-foreground">Moneda</label>
                     <CurrencySelect id="currency" name="currency" value={formCurrency} onChange={(e) => setFormCurrency(e.target.value)} options={currencyOptions} />
                   </div>
                   <input type="hidden" name="name" value={formName} />
@@ -173,7 +173,7 @@ export function BudgetsView({ userEmail, budgets, currencyOptions = ["EUR", "USD
         {budgets.filter(b => b.monthly_limit > 0).length > 0 && (
           <div className="mt-6 sm:mt-8">
             <Collapsible title="Análisis de Presupuestos" defaultOpen={false} className="w-full">
-              <p className="text-sm text-slate-500 mb-3">Haz clic para ver el análisis Gastado vs Límite. Se muestra en formato compacto para no robar atención al flujo principal.</p>
+              <p className="text-sm text-muted-foreground mb-3">Haz clic para ver el análisis Gastado vs Límite. Se muestra en formato compacto para no robar atención al flujo principal.</p>
               <BudgetOverviewChart budgets={budgets} currency={currencyOptions.includes("EUR") ? "EUR" : currencyOptions[0]} compact />
             </Collapsible>
           </div>

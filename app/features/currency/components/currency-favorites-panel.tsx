@@ -31,7 +31,7 @@ export function CurrencyFavoritesPanel({ snapshot, options, favorites }: Currenc
             <Star className="size-5 text-amber-500" />
             Monedas favoritas
           </CardTitle>
-          <p className="text-sm text-slate-500">Se guardan en Supabase por usuario y aparecen en cualquier dispositivo.</p>
+          <p className="text-sm text-muted-foreground">Se guardan en Supabase por usuario y aparecen en cualquier dispositivo.</p>
         </div>
       </CardHeader>
 
@@ -39,7 +39,7 @@ export function CurrencyFavoritesPanel({ snapshot, options, favorites }: Currenc
         <Form method="post" className="grid gap-3 sm:grid-cols-[1fr_auto]">
           <input type="hidden" name="_intent" value="add_favorite" />
           <div className="space-y-2">
-            <label htmlFor="currency_code" className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Agregar moneda</label>
+            <label htmlFor="currency_code" className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Agregar moneda</label>
             <SelectNative id="currency_code" name="currency_code" value={selectedCode} onChange={(event) => setSelectedCode(event.target.value)}>
               {orderedOptions.map((option) => (
                 <option key={option.code} value={option.code}>
@@ -75,7 +75,7 @@ export function CurrencyFavoritesPanel({ snapshot, options, favorites }: Currenc
             ))}
           </div>
         ) : (
-          <p className="text-sm text-slate-500">Aún no has guardado monedas favoritas. Usa el selector para empezar.</p>
+          <p className="text-sm text-muted-foreground">Aún no has guardado monedas favoritas. Usa el selector para empezar.</p>
         )}
 
         {favoriteOptions.length > 0 && (
@@ -84,11 +84,11 @@ export function CurrencyFavoritesPanel({ snapshot, options, favorites }: Currenc
               const converted = convertAmount(snapshot, 100, snapshot.base, option.code);
 
               return (
-                <div key={option.code} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div key={option.code} className="rounded-2xl border border-border bg-muted/50 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Favorita</p>
-                      <h2 className="mt-1 text-lg font-semibold text-slate-900">{option.code}</h2>
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Favorita</p>
+                      <h2 className="mt-1 text-lg font-semibold text-foreground">{option.code}</h2>
                     </div>
                     <Form method="post">
                       <input type="hidden" name="_intent" value="remove_favorite" />
@@ -96,18 +96,18 @@ export function CurrencyFavoritesPanel({ snapshot, options, favorites }: Currenc
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:text-slate-900 disabled:opacity-50"
+                        className="rounded-full border border-border bg-background p-2 text-muted-foreground transition hover:text-foreground hover:bg-muted disabled:opacity-50"
                         aria-label={`Eliminar ${option.code} de favoritas`}
                       >
                         <X className="size-4" />
                       </button>
                     </Form>
                   </div>
-                  <p className="mt-4 text-sm text-slate-500">{option.name}</p>
-                  <p className="mt-3 text-2xl font-semibold tabular-nums text-slate-900">
+                  <p className="mt-4 text-sm text-muted-foreground">{option.name}</p>
+                  <p className="mt-3 text-2xl font-semibold tabular-nums text-foreground">
                     {converted === null ? "--" : formatMoney(converted, option.code)}
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">Equivalente a 100 {snapshot.base}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Equivalente a 100 {snapshot.base}</p>
                 </div>
               );
             })}

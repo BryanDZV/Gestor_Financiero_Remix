@@ -24,7 +24,7 @@ export function TransactionItem({ tx, isCycleClosed, categories, budgets = [], i
 
   if (isEditing) {
     return (
-      <li className="border-b border-slate-100 bg-slate-50 p-3 last:border-0">
+      <li className="border-b border-border bg-muted/30 p-3 last:border-0">
         <Form method="post" className="flex w-full flex-col flex-wrap items-start gap-3 sm:flex-row sm:items-center" onSubmit={(e) => {
           e.preventDefault();
           submit(e.currentTarget, { method: "post" });
@@ -36,32 +36,32 @@ export function TransactionItem({ tx, isCycleClosed, categories, budgets = [], i
           <input type="hidden" name="_intent" value={isSplitting ? "split_transaction" : "edit_transaction"} />
           <input type="hidden" name="transaction_id" value={tx.id} />
           
-          <Input type="text" name="concept" defaultValue={tx.concept} required className="bg-white px-3 py-2 sm:flex-1" placeholder="Concepto" />
+          <Input type="text" name="concept" defaultValue={tx.concept} required className="bg-background px-3 py-2 sm:flex-1" placeholder="Concepto" />
           
-          <SelectNative name="type" defaultValue={tx.type} className="bg-white px-3 py-2 sm:w-auto">
+          <SelectNative name="type" defaultValue={tx.type} className="bg-background px-3 py-2 sm:w-auto">
             <option value="expense">Gasto</option>
             <option value="income">Ingreso</option>
             <option value="transfer">Transferencia</option>
           </SelectNative>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <SelectNative name="category_id" defaultValue={tx.category_id || ""} className="bg-white px-3 py-2 sm:w-auto text-sm">
+            <SelectNative name="category_id" defaultValue={tx.category_id || ""} className="bg-background px-3 py-2 sm:w-auto text-sm">
               <option value="">Sin etiqueta</option>
               {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </SelectNative>
-            <SelectNative name="budget_id" defaultValue={tx.budget_id || ""} className="bg-white px-3 py-2 sm:w-auto text-sm">
+            <SelectNative name="budget_id" defaultValue={tx.budget_id || ""} className="bg-background px-3 py-2 sm:w-auto text-sm">
               <option value="">Sin límite</option>
               {budgets.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
             </SelectNative>
           </div>
 
           {!isSplitting ? (
-            <Input type="number" name="amount" defaultValue={tx.amount} step="0.01" required className="bg-white px-3 py-2 tabular-nums sm:w-28" placeholder="Monto" />
+            <Input type="number" name="amount" defaultValue={tx.amount} step="0.01" required className="bg-background px-3 py-2 tabular-nums sm:w-28" placeholder="Monto" />
           ) : (
             <input type="hidden" name="amount" value={tx.amount} />
           )}
           
-          <Input type="date" name="date" defaultValue={tx.date ? tx.date.split('T')[0] : ''} required className="bg-white px-3 py-2 tabular-nums sm:w-36" />
+          <Input type="date" name="date" defaultValue={tx.date ? tx.date.split('T')[0] : ''} required className="bg-background px-3 py-2 tabular-nums sm:w-36" />
           
           <div className="mt-2 flex w-full items-center justify-end gap-2 sm:mt-0 sm:w-auto">
             {!isSplitting && otherWallets.length > 0 && (
@@ -72,23 +72,23 @@ export function TransactionItem({ tx, isCycleClosed, categories, budgets = [], i
             <button type="submit" className="rounded-md p-1.5 text-emerald-600 hover:bg-emerald-50" title={isSplitting ? "Confirmar división" : "Guardar"}>
               <Icon icon="ph:check" className="w-4 h-4" />
             </button>
-            <button type="button" onClick={() => { setIsEditing(false); setIsSplitting(false); setDestWalletId(""); }} className="rounded-md p-1.5 text-slate-400 hover:bg-slate-200" title="Cancelar">
+            <button type="button" onClick={() => { setIsEditing(false); setIsSplitting(false); setDestWalletId(""); }} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted" title="Cancelar">
               <Icon icon="ph:x" className="w-4 h-4" />
             </button>
           </div>
 
           {isSplitting && (
-            <div className="mt-2 flex w-full flex-col gap-3 rounded-lg border border-indigo-100 bg-indigo-50/50 p-3 sm:flex-row sm:items-end animate-in fade-in">
+            <div className="mt-2 flex w-full flex-col gap-3 rounded-lg border border-indigo-100 dark:border-indigo-500/20 bg-indigo-50/50 dark:bg-indigo-500/10 p-3 sm:flex-row sm:items-end animate-in fade-in">
               <div className="flex-1 space-y-1">
                 <label className="text-xs font-medium text-indigo-700">Mover a la cuenta:</label>
-                <SelectNative name="destination_wallet_id" value={destWalletId} onChange={(e) => setDestWalletId(e.target.value)} required className="bg-white">
+                <SelectNative name="destination_wallet_id" value={destWalletId} onChange={(e) => setDestWalletId(e.target.value)} required className="bg-background">
                   <option value="">Selecciona cuenta destino...</option>
                   {otherWallets.map((w: any) => <option key={w.id} value={w.id}>{w.name} {w.share_divisor > 1 ? `(÷${w.share_divisor})` : ''}</option>)}
                 </SelectNative>
               </div>
               <div className="w-full sm:w-40 space-y-1">
                 <label className="text-xs font-medium text-indigo-700">Monto a mover:</label>
-                <Input type="number" name="amount_to_move" value={amountToMove} onChange={(e) => setAmountToMove(e.target.value)} step="0.01" max={tx.amount} min={0.01} required className="bg-white tabular-nums" />
+                <Input type="number" name="amount_to_move" value={amountToMove} onChange={(e) => setAmountToMove(e.target.value)} step="0.01" max={tx.amount} min={0.01} required className="bg-background tabular-nums" />
                 {destDivisor > 1 && (
                   <p className="text-[10px] text-indigo-500 font-medium leading-tight pt-1">Se registrarán {finalAmount} {currency}</p>
                 )}
@@ -105,22 +105,22 @@ export function TransactionItem({ tx, isCycleClosed, categories, budgets = [], i
       <li 
         onClick={() => !isCycleClosed && onToggle()}
         className={cn(
-          "flex flex-col gap-3 border-b border-slate-100 p-4 transition-colors sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:p-4 last:border-0",
-          isCycleClosed ? "opacity-50" : "cursor-pointer hover:bg-red-50",
-          isSelected ? "bg-red-50" : "bg-white"
+          "flex flex-col gap-3 border-b border-border p-4 transition-colors sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:p-4 last:border-0",
+          isCycleClosed ? "opacity-50" : "cursor-pointer hover:bg-destructive/10",
+          isSelected ? "bg-destructive/10" : "bg-transparent"
         )}
       >
         <div className="flex flex-col w-full sm:w-auto">
-          <span className="text-sm font-medium text-slate-700">{tx.concept}</span>
-          {tx.date && <span className="mt-1 flex items-center text-xs tabular-nums text-slate-500"><Icon icon="ph:calendar-blank" className="mr-1 size-3" />{formatDate(tx.date)}</span>}
+          <span className="text-sm font-medium text-foreground">{tx.concept}</span>
+          {tx.date && <span className="mt-1 flex items-center text-xs tabular-nums text-muted-foreground"><Icon icon="ph:calendar-blank" className="mr-1 size-3" />{formatDate(tx.date)}</span>}
           <div className="flex flex-wrap items-center gap-2 mt-1.5">
             {tx.category_id && categories.find(c => c.id === tx.category_id) && (
-              <span className="flex w-max items-center rounded-md bg-slate-100 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-slate-500">
+              <span className="flex w-max items-center rounded-md bg-secondary px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 <Icon icon={categories.find(c => c.id === tx.category_id)?.icon || "ph:tag"} className="mr-1.5 size-3.5" />{categories.find(c => c.id === tx.category_id)?.name}
               </span>
             )}
             {tx.budget_id && budgets.find(b => b.id === tx.budget_id) && (
-              <span className="flex w-max items-center rounded-md bg-indigo-50 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-indigo-600">
+              <span className="flex w-max items-center rounded-md bg-indigo-50 dark:bg-indigo-500/10 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                 <Icon icon="ph:target-duotone" className="mr-1.5 size-3.5" />{budgets.find(b => b.id === tx.budget_id)?.name}
               </span>
             )}
@@ -135,18 +135,18 @@ export function TransactionItem({ tx, isCycleClosed, categories, budgets = [], i
   }
 
   return (
-    <li className="flex flex-col gap-3 border-b border-slate-100 bg-white p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:p-4 last:border-0">
+    <li className="flex flex-col gap-3 border-b border-border bg-transparent p-4 transition-colors hover:bg-muted/50 sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:p-4 last:border-0">
       <div className="flex flex-col w-full sm:w-auto">
-        <span className="text-sm font-medium text-slate-700">{tx.concept}</span>
+        <span className="text-sm font-medium text-foreground">{tx.concept}</span>
         {tx.date && (
-          <span className="mt-1 flex items-center text-xs tabular-nums text-slate-500">
+          <span className="mt-1 flex items-center text-xs tabular-nums text-muted-foreground">
             <Icon icon="ph:calendar-blank" className="mr-1 size-3" />
             {formatDate(tx.date)}
           </span>
         )}
         <div className="flex flex-wrap items-center gap-2 mt-1.5">
           {!isCycleClosed ? (
-            <Form method="post" className="relative inline-flex w-max items-center text-[10px] font-medium uppercase tracking-wider text-slate-500 transition-colors hover:text-blue-600" onChange={(e) => submit(e.currentTarget, { method: "post" })}>
+            <Form method="post" className="relative inline-flex w-max items-center text-[10px] font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:text-blue-600" onChange={(e) => submit(e.currentTarget, { method: "post" })}>
               <input type="hidden" name="_intent" value="edit_transaction" />
               <input type="hidden" name="transaction_id" value={tx.id} />
               <input type="hidden" name="concept" value={tx.concept} />
@@ -154,7 +154,7 @@ export function TransactionItem({ tx, isCycleClosed, categories, budgets = [], i
               <input type="hidden" name="amount" value={tx.amount} />
               <input type="hidden" name="date" value={tx.date ? tx.date.split('T')[0] : ''} />
               
-              <div className="flex items-center cursor-pointer rounded-md bg-slate-100 px-2 py-1 transition-colors hover:bg-blue-50">
+              <div className="flex items-center cursor-pointer rounded-md bg-secondary px-2 py-1 transition-colors hover:bg-blue-50 hover:text-blue-600">
                 <Icon icon={tx.category_id ? categories.find(c => c.id === tx.category_id)?.icon || "ph:tag" : "ph:tag-dashed"} className="mr-1.5 size-3.5" />
                 <span>{tx.category_id ? categories.find(c => c.id === tx.category_id)?.name : "Asignar etiqueta"}</span>
               </div>
@@ -166,7 +166,7 @@ export function TransactionItem({ tx, isCycleClosed, categories, budgets = [], i
             </Form>
           ) : (
             tx.category_id && categories.find(c => c.id === tx.category_id) && (
-              <span className="flex w-max items-center rounded-md bg-slate-100 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-slate-500">
+              <span className="flex w-max items-center rounded-md bg-secondary px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 <Icon icon={categories.find(c => c.id === tx.category_id)?.icon || "ph:tag"} className="mr-1.5 size-3.5" />
                 {categories.find(c => c.id === tx.category_id)?.name}
               </span>
@@ -174,7 +174,7 @@ export function TransactionItem({ tx, isCycleClosed, categories, budgets = [], i
           )}
 
           {tx.budget_id && budgets.find(b => b.id === tx.budget_id) && (
-            <span className="flex w-max items-center rounded-md bg-indigo-50 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-indigo-600">
+            <span className="flex w-max items-center rounded-md bg-indigo-50 dark:bg-indigo-500/10 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
               <Icon icon="ph:target-duotone" className="mr-1.5 size-3.5" />
               {budgets.find(b => b.id === tx.budget_id)?.name}
             </span>
@@ -186,7 +186,7 @@ export function TransactionItem({ tx, isCycleClosed, categories, budgets = [], i
         
         {!isCycleClosed && (
           <div className="flex items-center gap-2">
-            <button type="button" onClick={() => setIsEditing(true)} className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600" title="Editar">
+            <button type="button" onClick={() => setIsEditing(true)} className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-blue-50 hover:text-blue-600" title="Editar">
               <Icon icon="ph:pencil-simple" className="w-4 h-4" />
             </button>
           </div>

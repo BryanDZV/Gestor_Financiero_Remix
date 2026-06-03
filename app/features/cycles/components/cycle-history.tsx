@@ -36,10 +36,10 @@ export function CycleHistory({ cycles, categories = [], budgets = [], currency =
   }, [cycles, cycleSortOrder]);
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-border bg-card text-card-foreground p-6 shadow-sm">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="flex items-center text-lg font-semibold tracking-tight text-slate-900">
-          <Icon icon="ph:receipt" className="mr-2 size-5 text-slate-500" /> Historial de movimientos
+        <h2 className="flex items-center text-lg font-semibold tracking-tight text-foreground">
+          <Icon icon="ph:receipt" className="mr-2 size-5 text-muted-foreground" /> Historial de movimientos
         </h2>
         <div className="flex items-center justify-end relative">
           {isCycleDeleteMode ? (
@@ -85,7 +85,7 @@ export function CycleHistory({ cycles, categories = [], budgets = [], currency =
                   type="button"
                   variant="outline"
                   onClick={() => setIsOptionsOpen(!isOptionsOpen)}
-                  className="flex items-center gap-2 rounded-xl border-slate-200 bg-white text-slate-700 shadow-sm transition-all hover:bg-slate-50"
+                  className="flex items-center gap-2 rounded-xl border-border bg-background text-foreground shadow-sm transition-all hover:bg-muted"
                 >
                   <Icon icon="ph:faders-duotone" className="size-4" />
                   <span className="hidden sm:inline">Filtros y Opciones</span>
@@ -94,13 +94,13 @@ export function CycleHistory({ cycles, categories = [], budgets = [], currency =
                 {isOptionsOpen && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setIsOptionsOpen(false)} />
-                    <div className="absolute right-0 top-full mt-2 w-[320px] rounded-2xl border border-slate-200 bg-white p-5 shadow-xl z-20 animate-in fade-in zoom-in-95">
+                    <div className="absolute right-0 top-full mt-2 w-[320px] rounded-2xl border border-border bg-popover text-popover-foreground p-5 shadow-xl z-20 animate-in fade-in zoom-in-95">
                       
-                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-4">Ordenación de datos</h4>
+                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-4">Ordenación de datos</h4>
                       <div className="space-y-4">
                         <div className="flex items-center justify-between gap-4">
-                          <span className="text-sm font-medium text-slate-700 flex items-center shrink-0">
-                            <Icon icon="ph:calendar-blank" className="mr-2 text-slate-400 size-4" /> Meses
+                          <span className="text-sm font-medium flex items-center shrink-0">
+                            <Icon icon="ph:calendar-blank" className="mr-2 text-muted-foreground size-4" /> Meses
                           </span>
                           <SegmentedControl 
                             value={cycleSortOrder} 
@@ -109,8 +109,8 @@ export function CycleHistory({ cycles, categories = [], budgets = [], currency =
                           />
                         </div>
                         <div className="flex items-center justify-between gap-4">
-                          <span className="text-sm font-medium text-slate-700 flex items-center shrink-0">
-                            <Icon icon="ph:list-dashes" className="mr-2 text-slate-400 size-4" /> Movs.
+                          <span className="text-sm font-medium flex items-center shrink-0">
+                            <Icon icon="ph:list-dashes" className="mr-2 text-muted-foreground size-4" /> Movs.
                           </span>
                           <SegmentedControl 
                             value={txSortOrder} 
@@ -120,19 +120,19 @@ export function CycleHistory({ cycles, categories = [], budgets = [], currency =
                         </div>
                       </div>
 
-                      <div className="my-5 h-px w-full bg-slate-100" />
+                      <div className="my-5 h-px w-full bg-border" />
 
-                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-3">Limpieza masiva</h4>
+                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Limpieza masiva</h4>
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           onClick={() => { setIsCycleDeleteMode(true); setIsOptionsOpen(false); }}
-                          className="flex items-center justify-center gap-2 rounded-xl border border-red-100 bg-red-50 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-100 hover:text-red-700"
+                          className="flex items-center justify-center gap-2 rounded-xl border border-destructive/20 bg-destructive/10 py-2 text-xs font-medium text-destructive transition-colors hover:bg-destructive/20"
                         >
                           <Icon icon="ph:trash" className="size-3.5" /> Borrar Ciclos
                         </button>
                         <button
                           onClick={() => { setIsDeleteMode(true); setIsOptionsOpen(false); }}
-                          className="flex items-center justify-center gap-2 rounded-xl border border-red-100 bg-red-50 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-100 hover:text-red-700"
+                          className="flex items-center justify-center gap-2 rounded-xl border border-destructive/20 bg-destructive/10 py-2 text-xs font-medium text-destructive transition-colors hover:bg-destructive/20"
                         >
                           <Icon icon="ph:trash" className="size-3.5" /> Borrar Gastos
                         </button>
@@ -160,8 +160,8 @@ export function CycleHistory({ cycles, categories = [], budgets = [], currency =
             >
               <div className="flex items-center gap-2">
                 {isCycleDeleteMode && <SelectionIndicator isSelected={selectedCycles.has(cycle.id)} />}
-                <h3 className="flex items-center text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
-                  {cycle.name} {cycle.is_closed && <Icon icon="ph:lock" className="ml-2 size-3 text-slate-400" />}
+                <h3 className="flex items-center text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  {cycle.name} {cycle.is_closed && <Icon icon="ph:lock" className="ml-2 size-3 text-muted-foreground" />}
                 </h3>
               </div>
               {!isCycleDeleteMode && (
@@ -170,7 +170,7 @@ export function CycleHistory({ cycles, categories = [], budgets = [], currency =
                   <Form method="post">
                     <input type="hidden" name="_intent" value="open_cycle" />
                     <input type="hidden" name="cycle_id" value={cycle.id} />
-                    <button type="submit" className="flex items-center rounded-md px-2 py-1.5 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700" title="Reabrir ciclo">
+                    <button type="submit" className="flex items-center rounded-md px-2 py-1.5 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-500/10" title="Reabrir ciclo">
                       <Icon icon="ph:lock-open" className="mr-1 size-3.5" /> Reabrir
                     </button>
                   </Form>
@@ -178,7 +178,7 @@ export function CycleHistory({ cycles, categories = [], budgets = [], currency =
                   <Form method="post">
                     <input type="hidden" name="_intent" value="close_cycle" />
                     <input type="hidden" name="cycle_id" value={cycle.id} />
-                    <button type="submit" className="flex items-center rounded-md px-2 py-1.5 text-xs font-medium text-amber-600 transition-colors hover:bg-amber-50 hover:text-amber-700" title="Cerrar ciclo">
+                    <button type="submit" className="flex items-center rounded-md px-2 py-1.5 text-xs font-medium text-amber-600 transition-colors hover:bg-amber-500/10" title="Cerrar ciclo">
                       <Icon icon="ph:lock" className="mr-1 size-3.5" /> Cerrar ciclo
                     </button>
                   </Form>
@@ -192,12 +192,12 @@ export function CycleHistory({ cycles, categories = [], budgets = [], currency =
                         Confirmar
                       </button>
                     </Form>
-                    <button type="button" onClick={() => setCycleToDelete(null)} className="flex items-center rounded-md px-2 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100">
+                    <button type="button" onClick={() => setCycleToDelete(null)} className="flex items-center rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted">
                       Cancelar
                     </button>
                   </div>
                 ) : (
-                  <button type="button" onClick={() => setCycleToDelete(cycle.id)} className="flex items-center rounded-md px-2 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700" title="Eliminar ciclo">
+                  <button type="button" onClick={() => setCycleToDelete(cycle.id)} className="flex items-center rounded-md px-2 py-1.5 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10" title="Eliminar ciclo">
                     <Icon icon="ph:trash" className="size-4" />
                   </button>
                 )}
@@ -206,9 +206,9 @@ export function CycleHistory({ cycles, categories = [], budgets = [], currency =
             </div>
             
             {cycle.transactions?.length === 0 ? (
-              <p className="text-sm italic text-slate-400">Sin movimientos en este ciclo.</p>
+              <p className="text-sm italic text-muted-foreground">Sin movimientos en este ciclo.</p>
               ) : (
-              <ul className="overflow-hidden rounded-2xl border border-slate-100 divide-y divide-slate-100">
+              <ul className="overflow-hidden rounded-2xl border border-border divide-y divide-border">
                 {(() => {
                   const sortedTxs = [...(cycle.transactions ?? [])].sort((a, b) => {
                     const timeA = new Date(a.date || 0).getTime();
@@ -241,11 +241,11 @@ export function CycleHistory({ cycles, categories = [], budgets = [], currency =
                         />
                       ))}
                       {hasMore && (
-                        <li className="bg-slate-50 p-4 text-center">
+                        <li className="bg-muted/30 p-4 text-center">
                           <button
                             type="button"
                             onClick={() => setVisibleCounts(prev => ({ ...prev, [cycle.id]: visibleTxCount + 50 }))}
-                            className="inline-flex items-center rounded-full bg-white px-4 py-2 text-xs font-medium text-slate-600 shadow-sm border border-slate-200 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                            className="inline-flex items-center rounded-full bg-background px-4 py-2 text-xs font-medium text-muted-foreground shadow-sm border border-border transition-colors hover:bg-muted hover:text-foreground"
                           >
                             <Icon icon="ph:plus-circle" className="mr-2 size-4" />
                             Cargar más movimientos ({sortedTxs.length - visibleTxCount} restantes)

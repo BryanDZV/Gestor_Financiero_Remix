@@ -23,11 +23,11 @@ export function AccountHeader({ name, isLiability, targetAmount, currentBalance,
   }
 
   return (
-    <header className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <header className="rounded-3xl border border-border bg-card text-card-foreground p-6 shadow-sm">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="flex-1">
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">{name}</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{name}</h1>
             {isLiability && (
               <Badge variant="warning">
                 Pasivo
@@ -39,7 +39,7 @@ export function AccountHeader({ name, isLiability, targetAmount, currentBalance,
               </Badge>
             )}
           </div>
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-muted-foreground">
             {isLiability 
               ? hasTarget ? <span>Deuda original: <PrivacyBlur>{formatMoney(target, currency)}</PrivacyBlur></span> : "Cuenta de pasivo / deuda"
               : hasTarget ? <span>Meta a alcanzar: <PrivacyBlur>{formatMoney(target, currency)}</PrivacyBlur></span> : "Cuenta de ahorro / activo"}
@@ -47,7 +47,7 @@ export function AccountHeader({ name, isLiability, targetAmount, currentBalance,
           
           {hasTarget && (
             <div className="mt-5 max-w-md">
-              <div className="mb-1.5 flex justify-between text-xs font-medium text-slate-500">
+              <div className="mb-1.5 flex justify-between text-xs font-medium text-muted-foreground">
                 <span>Progreso {isLiability ? 'de liquidación' : 'de ahorro'}</span>
                 <span className="tabular-nums">{progress.toFixed(1)}%</span>
               </div>
@@ -60,8 +60,8 @@ export function AccountHeader({ name, isLiability, targetAmount, currentBalance,
           )}
         </div>
 
-        <div className="shrink-0 rounded-2xl bg-slate-50 px-4 py-3 text-left lg:min-w-56 lg:text-right">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Saldo actual</p>
+        <div className="shrink-0 rounded-2xl bg-muted/50 px-4 py-3 text-left lg:min-w-56 lg:text-right">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Saldo actual</p>
           <p className={`mt-2 text-3xl font-semibold tracking-tight tabular-nums sm:text-4xl ${balanceClass}`}>
             <PrivacyBlur>
               {formatMoney(balance, currency)}

@@ -57,7 +57,7 @@ export function SubscriptionsView({ userEmail, subscriptions, wallets }: Subscri
   return (
     <DashboardLayout userEmail={userEmail}>
       <div className="mx-auto max-w-6xl space-y-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        <header className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
           <PageHeader 
             supertitle="Gastos Fijos" 
             title="Suscripciones" 
@@ -109,17 +109,17 @@ export function SubscriptionsView({ userEmail, subscriptions, wallets }: Subscri
                   <input type="hidden" name="_intent" value="create_subscription" />
                   
                   <div className="space-y-1">
-                    <label htmlFor="name" className="text-xs font-medium text-slate-500">Nombre del servicio</label>
+                    <label htmlFor="name" className="text-xs font-medium text-muted-foreground">Nombre del servicio</label>
                     <Input id="name" type="text" name="name" placeholder="Ej. Netflix, Gimnasio..." required />
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="amount" className="text-xs font-medium text-slate-500">Costo</label>
+                    <label htmlFor="amount" className="text-xs font-medium text-muted-foreground">Costo</label>
                     <Input id="amount" type="number" step="0.01" name="amount" placeholder="Ej. 15.99" required className="tabular-nums" />
                   </div>
                   
                   <div className="space-y-1">
-                    <label htmlFor="billing_period" className="text-xs font-medium text-slate-500">Frecuencia de cobro</label>
+                    <label htmlFor="billing_period" className="text-xs font-medium text-muted-foreground">Frecuencia de cobro</label>
                     <SelectNative id="billing_period" name="billing_period">
                       <option value="monthly">Mensual</option>
                       <option value="yearly">Anual</option>
@@ -127,12 +127,12 @@ export function SubscriptionsView({ userEmail, subscriptions, wallets }: Subscri
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="start_date" className="text-xs font-medium text-slate-500">Fecha del primer cobro</label>
+                    <label htmlFor="start_date" className="text-xs font-medium text-muted-foreground">Fecha del primer cobro</label>
                     <Input id="start_date" type="date" name="start_date" defaultValue={new Date().toISOString().split('T')[0]} required />
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="wallet_id" className="text-xs font-medium text-slate-500">Cuenta de cobro (Opcional)</label>
+                    <label htmlFor="wallet_id" className="text-xs font-medium text-muted-foreground">Cuenta de cobro (Opcional)</label>
                     <SelectNative id="wallet_id" name="wallet_id">
                       <option value="">Ninguna en específico</option>
                       {wallets.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
