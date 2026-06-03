@@ -14,6 +14,7 @@ import { usePersistentAlertCenter } from "~/hooks/use-persistent-alert-center";
 import { FormError } from "~/components/ui/form-error";
 import type { AccountDetailViewProps } from "~/types";
 import { usePrivacy } from "~/hooks/use-privacy";
+import { exportTransactionsToPDF } from "~/utils/pdf-export.client";
 
 export function AccountDetailView({
   userEmail,
@@ -45,6 +46,16 @@ export function AccountDetailView({
   } = usePersistentAlertCenter(`account-alerts:${userEmail}`);
   const { isPrivate, togglePrivacy } = usePrivacy();
 
+  const handleExportPDF = () => {
+    // Juntamos todos los movimientos de todos los ciclos y les inyectamos los nombres de etiquetas
+    const allTransactions = cycles.flatMap(c => c.transactions || []).map(tx => ({
+      ...tx,
+      categories: { name: categories?.find(cat => cat.id === tx.category_id)?.name },
+      budgets: { name: budgets?.find(b => b.id === tx.budget_id)?.name }
+    }));
+    exportTransactionsToPDF(allTransactions, wallet.name, wallet.currency || "EUR");
+  };
+
   useAccountActionFeedback({ actionData, actionError, isSubmitting, onFeedback: addAlert });
 
   return (
@@ -55,13 +66,17 @@ export function AccountDetailView({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link
             to="/dashboard/cuentas"
-            className="inline-flex items-center text-sm font-medium text-slate-500 transition-colors hover:text-slate-900"
+            className="inline-flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="w-4 h-4 mr-2" /> Mis Cuentas
           </Link>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={togglePrivacy} className="rounded-xl border-slate-200 bg-white text-slate-700 h-10">
+          <Button variant="outline" onClick={handleExportPDF} className="rounded-xl border-border bg-background text-foreground hover:bg-muted h-10" title="Descargar todos los movimientos en PDF">
+            <Icon icon="ph:file-pdf-duotone" className="size-4 sm:mr-2 text-red-500" />
+            <span className="hidden sm:inline">Exportar PDF</span>
+          </Button>
+          <Button variant="outline" onClick={togglePrivacy} className="rounded-xl border-border bg-background text-foreground hover:bg-muted h-10">
             <Icon icon={isPrivate ? "ph:eye-slash-duotone" : "ph:eye-duotone"} className="size-4 sm:mr-2" />
             <span className="hidden sm:inline">{isPrivate ? "Mostrar" : "Ocultar"}</span>
           </Button>
