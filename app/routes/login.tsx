@@ -11,12 +11,22 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const intent = formData.get("_intent") as string;
 
   // Inicializamos la infraestructura de Supabase para esta petición HTTP específica
   const { supabase, headers } = getSupabase(request);
 
-  // Ejecutamos la llamada al servicio de autenticación
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  let error;
+
+  if (intent === "register") {
+    // Modo Crear Cuenta
+    const { error: signUpError } = await supabase.auth.signUp({ email, password });
+    error = signUpError;
+  } else {
+    // Modo Iniciar Sesión normal
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    error = signInError;
+  }
 
   if (error) {
     // Retornamos el error serializado en JSON si la autenticación falla
