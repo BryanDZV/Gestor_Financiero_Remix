@@ -24,7 +24,7 @@ function SeverityIcon({ severity }: { severity: "success" | "warning" | "error" 
 export function AlertCenterPanel({ alerts, unreadCount, isOpen, onToggle, onClearAll, onDismissAlert }: AlertCenterPanelProps) {
   return (
     <div className="relative">
-      <Button type="button" variant="outline" onClick={onToggle} className="relative rounded-xl border-slate-200 bg-white">
+      <Button type="button" variant="outline" onClick={onToggle} className="relative rounded-xl border-border bg-background hover:bg-muted text-foreground">
         <Bell className="mr-2 size-4" />
         Alertas
         {unreadCount > 0 && (
@@ -36,32 +36,32 @@ export function AlertCenterPanel({ alerts, unreadCount, isOpen, onToggle, onClea
 
       {isOpen && (
         <div className="absolute right-0 z-40 mt-2 w-88 max-w-[92vw]">
-          <Card className="border-slate-200 shadow-lg">
+          <Card className="border-border shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-base">Centro de alertas</CardTitle>
               <div className="flex items-center gap-2">
                 <Button type="button" variant="ghost" size="icon" className="size-8" onClick={onClearAll} title="Borrar historial" aria-label="Borrar historial de alertas">
-                  <Trash2 className="size-4 text-slate-500" />
+                  <Trash2 className="size-4 text-muted-foreground" />
                 </Button>
                 <Button type="button" variant="ghost" size="icon" className="size-8" onClick={onToggle} title="Cerrar panel" aria-label="Cerrar panel de alertas">
-                  <X className="size-4 text-slate-500" />
+                  <X className="size-4 text-muted-foreground" />
                 </Button>
               </div>
             </CardHeader>
 
             <CardContent className="max-h-96 space-y-2 overflow-auto">
               {alerts.length === 0 ? (
-                <p className="text-sm text-slate-500">No hay alertas recientes.</p>
+                <p className="text-sm text-muted-foreground">No hay alertas recientes.</p>
               ) : (
                 alerts.map((alert) => (
-                  <div key={alert.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                  <div key={alert.id} className="rounded-lg border border-border bg-muted/50 p-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex items-center gap-2">
                           <SeverityIcon severity={alert.severity} />
-                          <span className="text-xs font-medium text-slate-500">{formatAlertDate(alert.createdAt)}</span>
+                          <span className="text-xs font-medium text-muted-foreground">{formatAlertDate(alert.createdAt)}</span>
                         </div>
-                        <p className="text-sm text-slate-700">{alert.message}</p>
+                        <p className="text-sm text-foreground">{alert.message}</p>
                       </div>
 
                       <Button
@@ -73,7 +73,7 @@ export function AlertCenterPanel({ alerts, unreadCount, isOpen, onToggle, onClea
                         title="Descartar alerta"
                         aria-label="Descartar alerta"
                       >
-                        <X className="size-3.5 text-slate-500" />
+                        <X className="size-3.5 text-muted-foreground" />
                       </Button>
                     </div>
                   </div>

@@ -17,11 +17,11 @@ export function MultiSelectActions({
   if (isDeleteMode) {
     return (
       <>
-        <Button type="button" onClick={() => selectedCount === totalCount ? onClearSelection() : onSelectAll()} variant="outline" className="rounded-xl border-slate-200 bg-white text-slate-700">
+        <Button type="button" onClick={() => selectedCount === totalCount ? onClearSelection() : onSelectAll()} variant="outline" className="rounded-xl border-border bg-background text-foreground hover:bg-muted">
           <Icon icon="ph:check-square-offset" className="mr-2 size-4" />
           <span className="hidden sm:inline">{selectedCount === totalCount ? "Deseleccionar" : "Seleccionar todo"}</span>
         </Button>
-        <Button type="button" onClick={() => { onToggleMode(false); onClearSelection(); }} variant="outline" className="rounded-xl border-slate-200 bg-white text-slate-700">
+        <Button type="button" onClick={() => { onToggleMode(false); onClearSelection(); }} variant="outline" className="rounded-xl border-border bg-background text-foreground hover:bg-muted">
           Cancelar
         </Button>
         <DeleteConfirm text={`¿Eliminar ${selectedCount} ${itemName}?`} onConfirm={onDelete} trigger={(onClick) => (
@@ -37,7 +37,7 @@ export function MultiSelectActions({
   return (
     <>
       {totalCount > 0 && (
-        <Button type="button" onClick={() => onToggleMode(true)} variant="outline" className="rounded-xl border-slate-200 bg-white text-slate-700 hover:text-red-600 hover:bg-red-50">
+        <Button type="button" onClick={() => onToggleMode(true)} variant="outline" className="rounded-xl border-border bg-background text-foreground hover:text-red-600 hover:bg-red-50">
           <Icon icon="ph:trash" className="mr-2 size-4" /> Eliminar
         </Button>
       )}

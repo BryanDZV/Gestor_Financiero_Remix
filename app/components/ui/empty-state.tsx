@@ -5,7 +5,7 @@ import type { EmptyStateProps } from "~/types";
 export function EmptyState({ message, children, className }: EmptyStateProps) {
   return (
     <Card className={cn("border-dashed", className)}>
-      <CardContent className="p-8 text-center text-slate-500">
+      <CardContent className="p-8 text-center text-muted-foreground">
         {message || children}
       </CardContent>
     </Card>

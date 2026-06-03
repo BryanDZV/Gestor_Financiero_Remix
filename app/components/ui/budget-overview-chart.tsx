@@ -24,9 +24,9 @@ export function BudgetOverviewChart({ budgets, currency = "EUR", compact = false
   const yAxisWidth = compact ? 64 : 85;
 
   return (
-    <Card className="border-slate-200 shadow-sm overflow-hidden">
-      <CardHeader className="bg-slate-50/50 pb-4 border-b border-slate-100">
-        <CardTitle className="text-base flex items-center gap-2 text-slate-800">
+    <Card className="border-border shadow-sm overflow-hidden">
+      <CardHeader className="bg-muted/50 pb-4 border-b border-border">
+        <CardTitle className="text-base flex items-center gap-2 text-foreground">
           <Icon icon="ph:chart-bar-duotone" className="size-5 text-indigo-500" />
           Análisis de Presupuestos (Gastado vs Límite)
         </CardTitle>

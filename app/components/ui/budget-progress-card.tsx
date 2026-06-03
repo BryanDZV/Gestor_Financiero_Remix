@@ -16,17 +16,17 @@ export function BudgetProgressCard({ budget, currency = "EUR", onEdit }: BudgetP
   const bgColor = isOverBudget ? "bg-red-50" : "bg-slate-50";
 
   return (
-    <Card className={`overflow-hidden transition-all ${isOverBudget ? 'border-red-200 shadow-red-100/50' : 'border-slate-200'}`}>
+    <Card className={`overflow-hidden transition-all ${isOverBudget ? 'border-red-200 shadow-red-100/50' : 'border-border'}`}>
       <CardContent className="p-5">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h2 className="font-semibold text-slate-900">{budget.name}</h2>
+            <h2 className="font-semibold text-foreground">{budget.name}</h2>
             <p className="text-xs font-medium mt-1">
               {!hasLimit 
-                ? <span className="text-slate-500">Gastado este mes</span>
+                ? <span className="text-muted-foreground">Gastado este mes</span>
                 : isOverBudget 
                   ? <span className="text-red-600">¡Te has pasado por {formatMoney(spent - limit, currency)}!</span>
-                  : <span className="text-slate-500">Quedan {formatMoney(limit - spent, currency)} libres</span>
+                  : <span className="text-muted-foreground">Quedan {formatMoney(limit - spent, currency)} libres</span>
               }
             </p>
           </div>
@@ -39,14 +39,14 @@ export function BudgetProgressCard({ budget, currency = "EUR", onEdit }: BudgetP
                   e.stopPropagation();
                   onEdit();
                 }} 
-                className="relative z-10 p-2 rounded-xl bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" 
+                className="relative z-10 p-2 rounded-xl bg-secondary text-muted-foreground hover:text-blue-600 hover:bg-blue-50 transition-colors" 
                 title="Editar presupuesto"
               >
                 <Icon icon="ph:pencil-simple-duotone" className="size-5" />
               </button>
             )}
-            <div className={`p-2 rounded-xl ${bgColor}`}>
-              <Icon icon="ph:target-duotone" className={`size-5 ${isOverBudget ? 'text-red-500' : 'text-slate-500'}`} />
+            <div className={`p-2 rounded-xl ${isOverBudget ? "bg-red-50" : "bg-secondary"}`}>
+              <Icon icon="ph:target-duotone" className={`size-5 ${isOverBudget ? 'text-red-500' : 'text-muted-foreground'}`} />
             </div>
           </div>
         </div>
@@ -54,14 +54,14 @@ export function BudgetProgressCard({ budget, currency = "EUR", onEdit }: BudgetP
         {hasLimit ? (
           <div className="space-y-2">
             <div className="flex justify-between text-sm font-medium">
-              <span className={isOverBudget ? "text-red-600 font-bold" : "text-slate-700"}>{formatMoney(spent, currency)}</span>
-              <span className="text-slate-500">de {formatMoney(limit, currency)}</span>
+              <span className={isOverBudget ? "text-red-600 font-bold" : "text-foreground"}>{formatMoney(spent, currency)}</span>
+              <span className="text-muted-foreground">de {formatMoney(limit, currency)}</span>
             </div>
-            <Progress value={percentage} indicatorClassName={progressColor} className="h-2.5 bg-slate-100" />
+            <Progress value={percentage} indicatorClassName={progressColor} className="h-2.5 bg-secondary" />
           </div>
         ) : (
           <div className="mt-2">
-            <span className="text-2xl font-bold tracking-tight text-slate-800">{formatMoney(spent, currency)}</span>
+            <span className="text-2xl font-bold tracking-tight text-foreground">{formatMoney(spent, currency)}</span>
           </div>
         )}
       </CardContent>

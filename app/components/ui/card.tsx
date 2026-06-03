@@ -5,7 +5,7 @@ import { cn } from "~/lib/utils";
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      className={cn("rounded-2xl border border-slate-200 bg-white shadow-sm", className)}
+      className={cn("rounded-2xl border border-border bg-card text-card-foreground shadow-sm", className)}
       {...props}
     />
   );
@@ -16,15 +16,19 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("text-lg font-semibold tracking-tight text-slate-900", className)} {...props} />;
+  return <div className={cn("text-lg font-semibold tracking-tight", className)} {...props} />;
 }
 
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("text-sm text-slate-500", className)} {...props} />;
+  return <div className={cn("text-sm text-muted-foreground", className)} {...props} />;
 }
 
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return <div className={cn("p-6 pt-0", className)} {...props} />;
 }
 
-export { Card, CardContent, CardDescription, CardHeader, CardTitle };
+function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
+  return <div className={cn("flex items-center p-6 pt-0", className)} {...props} />;
+}
+
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle };
