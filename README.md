@@ -1,110 +1,58 @@
-# Welcome to React Router!
+# Gestor Financiero
 
-A modern, production-ready template for building full-stack React applications using React Router.
+Aplicación web para la gestión de finanzas personales, desarrollada para ofrecer control sobre ingresos, gastos, presupuestos y planificación de metas financieras. 
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+## Características Principales
 
-## Features
+- Autenticación: Sistema de inicio de sesión gestionado a través de Supabase.
+- Panel General: Vista resumida del estado financiero del usuario.
+- Gestión de Cuentas: Registro y visualización del saldo en múltiples cuentas o billeteras.
+- Transacciones: Ingreso y categorización de movimientos de dinero (ingresos y egresos).
+- Presupuestos: Asignación de límites de gasto mensuales por categoría.
+- Suscripciones: Seguimiento de servicios recurrentes y sus próximas fechas de cobro.
+- Planificador de Deudas: Módulo para registrar deudas y organizar estrategias de pago.
+- Multimoneda: Soporte para gestionar finanzas en diferentes divisas.
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+## Arquitectura y Buenas Prácticas
 
-## Getting Started
+El proyecto está diseñado buscando la mantenibilidad y una clara separación de responsabilidades:
 
-### Installation
+- **Arquitectura por Funcionalidades (Feature-Driven):** El código está organizado por dominios de negocio (ej. `accounts`, `transactions`, `budgets`) dentro de la carpeta `features`. Esto encapsula la lógica, vistas y componentes propios de cada módulo, facilitando el mantenimiento a largo plazo.
+- **Renderizado del Lado del Servidor (SSR):** Se utilizan los *loaders* y *actions* de React Router 7 para obtener y mutar datos directamente desde el servidor. Esto mejora el rendimiento inicial y la seguridad de las transacciones.
+- **Separación de Responsabilidades Frontend/Backend:** Se implementan archivos con el sufijo `.server.ts` para aislar la lógica de acceso a datos e integraciones con APIs, garantizando que el código sensible jamás se envíe al cliente.
+- **Sistema de Componentes Reutilizables:** Se emplea `shadcn/ui` para disponer de componentes de UI accesibles (basados en Radix UI) y centralizados en `components/ui`, lo cual mantiene una línea gráfica unificada en toda la aplicación.
+- **Tipado Estricto (End-to-End Type Safety):** Uso de TypeScript en toda la aplicación para tipar respuestas de base de datos, props de componentes y utilidades, previniendo errores durante el desarrollo.
+- **Control de Versiones de Base de Datos:** Las modificaciones al esquema de PostgreSQL se gestionan a través de migraciones de Supabase (carpeta `supabase/migrations`), manteniendo un registro histórico de cambios en la base de datos como código.
 
-Install the dependencies:
+## Tecnologías Utilizadas
 
-```bash
-npm install
-```
+- Frontend: React y React Router 7
+- Lenguaje: TypeScript
+- Estilos: Tailwind CSS y shadcn/ui
+- Backend y Base de Datos: Supabase (PostgreSQL y Supabase Auth)
+- Entorno de Desarrollo: Vite
 
-### Development
+## Instalación y Configuración Local
 
-Start the development server with HMR:
+1. Clonar el repositorio en el equipo local.
+2. Instalar las dependencias del proyecto:
+   ```bash
+   npm install
+   ```
+3. Configurar las variables de entorno. Es necesario crear un archivo `.env` en la raíz del proyecto con las siguientes claves de Supabase:
+   ```text
+   SUPABASE_URL=url_del_proyecto
+   SUPABASE_ANON_KEY=clave_anonima
+   ```
+4. Iniciar el entorno de desarrollo:
+   ```bash
+   npm run dev
+   ```
+   La aplicación se podrá visualizar en `http://localhost:5173`.
 
-```bash
-npm run dev
-```
+## Integración Continua y Despliegue (CI/CD)
 
-Your application will be available at `http://localhost:5173`.
-
-## Building for Production
-
-Create a production build:
-
-```bash
-npm run build
-```
-
-## Deployment
-
-### Branch Strategy and CI/CD
-
-This repository uses two long-lived branches:
-
-- `develop`: integration branch. Pushes here deploy preview builds to Vercel.
-- `main`: production branch. Pushes here deploy production builds to Vercel.
-
-GitHub Actions workflows live in [`.github/workflows`](.github/workflows) and currently do three things:
-
-- `ci.yml`: runs on pull requests and pushes to `develop`/`main`, then executes `npm run typecheck` and `npm run build`.
-- `deploy-preview.yml`: runs on pushes to `develop` and deploys a preview using the Vercel CLI.
-- `deploy-production.yml`: runs on pushes to `main` and deploys production using the Vercel CLI.
-
-Required GitHub secrets for deployment:
-
-- `VERCEL_TOKEN`
-- `VERCEL_ORG_ID`
-- `VERCEL_PROJECT_ID`
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
-
-For Vercel deployments, the project uses the official React Router preset via `@vercel/react-router` in `react-router.config.ts`.
-
-### Docker Deployment
-
-To build and run using Docker:
-
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
-```
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+El repositorio incluye configuración de GitHub Actions para automatizar procesos:
+- Verificación de tipos y validación de compilación en cada Pull Request.
+- Despliegue automático de entornos de prueba al actualizar la rama `develop`.
+- Despliegue a producción mediante Vercel al actualizar la rama `main`.
