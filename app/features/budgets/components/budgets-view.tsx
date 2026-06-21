@@ -10,29 +10,56 @@ import { PageHeader } from "~/components/ui/page-header";
 import { FormError } from "~/components/ui/form-error";
 import { EmptyState } from "~/components/ui/empty-state";
 import { Input } from "~/components/ui/input";
-import type { BudgetsViewProps } from "~/types";
+import { SubmitButton } from "~/components/ui/submit-button";
+import { SelectionIndicator } from "~/components/ui/selection-indicator";
+import { BudgetOverviewChart } from "~/components/ui/budget-overview-chart";
+import { Collapsible } from "~/components/ui/collapsible";
+import { BudgetProgressCard } from "~/components/ui/budget-progress-card";
+import { CurrencySelect } from "~/components/ui/currency-select";
+import type { BudgetsViewProps, Budget } from "~/types";
 
-export function BudgetsView({ userEmail, budgets }: BudgetsViewProps) {
+export function BudgetsView({ userEmail, budgets, currencyOptions = ["EUR", "USD", "GBP", "MXN"] }: BudgetsViewProps) {
   const navigation = useNavigation();
   const submit = useSubmit();
   const actionData = useActionData<{ error?: string; success?: boolean }>();
   const isSubmitting = navigation.state !== "idle";
   const formRef = useRef<HTMLFormElement>(null);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
+  const [selectedBudgets, setSelectedBudgets] = useState<Set<string>>(new Set());
+  const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
+  const [formName, setFormName] = useState<string>("");
+  const [formMonthlyLimit, setFormMonthlyLimit] = useState<string>("0");
+  const [formCurrency, setFormCurrency] = useState<string>(currencyOptions[0]);
 
   useEffect(() => {
     if (navigation.state === "idle" && actionData?.success) {
-      formRef.current?.reset();
+      // Limpiar estado del formulario controlado después de una acción exitosa
       setIsDeleteMode(false);
-      setSelectedCategories(new Set());
+      setSelectedBudgets(new Set());
+      setEditingBudget(null);
+      setFormName("");
+      setFormMonthlyLimit("0");
+      setFormCurrency(currencyOptions[0]);
     }
-  }, [navigation.state, actionData]);
+  }, [navigation.state, actionData, currencyOptions]);
+
+  useEffect(() => {
+    // Sincronizar valores del formulario controlado cuando cambia el presupuesto a editar
+    if (editingBudget) {
+      setFormName(editingBudget.name || "");
+      setFormMonthlyLimit(String(editingBudget.monthly_limit ?? 0));
+      setFormCurrency(editingBudget.currency || currencyOptions[0]);
+    } else {
+      setFormName("");
+      setFormMonthlyLimit("0");
+      setFormCurrency(currencyOptions[0]);
+    }
+  }, [editingBudget, currencyOptions]);
 
   return (
     <DashboardLayout userEmail={userEmail}>
       <div className="mx-auto max-w-6xl space-y-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        <header className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
           <PageHeader 
             supertitle="Categorías" 
             title="Presupuestos" 
@@ -41,42 +68,63 @@ export function BudgetsView({ userEmail, budgets }: BudgetsViewProps) {
           <div className="flex flex-wrap items-center gap-2">
             <MultiSelectActions
               isDeleteMode={isDeleteMode}
-              selectedCount={selectedCategories.size}
+              selectedCount={selectedBudgets.size}
               totalCount={budgets.length}
               onToggleMode={setIsDeleteMode}
-              onSelectAll={() => setSelectedCategories(new Set(budgets.map(b => b.id)))}
-              onClearSelection={() => setSelectedCategories(new Set())}
+              onSelectAll={() => setSelectedBudgets(new Set(budgets.map(b => b.id)))}
+              onClearSelection={() => setSelectedBudgets(new Set())}
               onDelete={() => {
                 const fd = new FormData();
-                fd.append("_intent", "delete_categories");
-                selectedCategories.forEach(id => fd.append("category_ids", id));
+                fd.append("_intent", "delete_budgets");
+                selectedBudgets.forEach(id => fd.append("budget_ids", id));
                 submit(fd, { method: "post" });
               }}
-              itemName="categoría(s)"
+              itemName="presupuesto(s)"
             />
           </div>
         </header>
 
+        {/* La gráfica pasa a un panel desplegable al final para no competir con la creación/edición.
+            Se muestra en versión compacta dentro del plegable. */}
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-1">
             <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Nueva categoría</CardTitle>
-                <CardDescription>Crea un presupuesto mensual.</CardDescription>
+              <CardHeader className="flex flex-row items-start justify-between gap-2">
+                <div>
+                  <CardTitle className="text-base">{editingBudget ? "Editar presupuesto" : "Nuevo presupuesto"}</CardTitle>
+                  <CardDescription>{editingBudget ? "Modifica los valores de tu presupuesto." : "Crea un presupuesto mensual."}</CardDescription>
+                </div>
+                {editingBudget && (
+                  <Button variant="ghost" size="icon" onClick={() => setEditingBudget(null)} className="h-8 w-8 rounded-full">
+                    <Icon icon="ph:x" className="size-4 text-slate-500" />
+                  </Button>
+                )}
               </CardHeader>
               <CardContent>
-                <Form ref={formRef} method="post" className="space-y-4">
+                <Form ref={formRef} method="post" className="space-y-4" key={editingBudget ? editingBudget.id : "new"}>
                   <FormError error={actionData?.error} />
 
-                  <input type="hidden" name="_intent" value="create_category" />
-                  <Input type="text" name="name" placeholder="Ej. Ocio, Compras..." required />
+                  <input type="hidden" name="_intent" value={editingBudget ? "edit_budget" : "create_budget"} />
+                  {editingBudget && <input type="hidden" name="budget_id" value={editingBudget.id} />}
+                  
+                  <Input type="text" name="name" placeholder="Ej. Ocio, Restaurantes..." value={formName} onChange={(e) => setFormName(e.target.value)} required />
+
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-slate-500">Límite mensual (0 = Sin límite)</label>
-                    <Input type="number" step="0.01" name="monthly_limit" defaultValue={0} min={0} required className="tabular-nums" />
+                    <label htmlFor="monthly_limit" className="text-xs font-medium text-muted-foreground">Límite mensual (0 = Sin límite)</label>
+                    <Input id="monthly_limit" type="number" step="0.01" name="monthly_limit" value={formMonthlyLimit} onChange={(e) => setFormMonthlyLimit(e.target.value)} min={0} required className="tabular-nums" />
                   </div>
-                  <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-xl bg-blue-600 text-white shadow-sm hover:bg-blue-700">
-                    {isSubmitting ? "Guardando..." : "Crear presupuesto"}
-                  </Button>
+
+                  <div className="space-y-1">
+                    <label htmlFor="currency" className="text-xs font-medium text-muted-foreground">Moneda</label>
+                    <CurrencySelect id="currency" name="currency" value={formCurrency} onChange={(e) => setFormCurrency(e.target.value)} options={currencyOptions} />
+                  </div>
+                  <input type="hidden" name="name" value={formName} />
+                  <input type="hidden" name="monthly_limit" value={formMonthlyLimit} />
+                  <input type="hidden" name="currency" value={formCurrency} />
+                  <SubmitButton isSubmitting={isSubmitting}>
+                    {editingBudget ? "Guardar cambios" : "Crear presupuesto"}
+                  </SubmitButton>
                 </Form>
               </CardContent>
             </Card>
@@ -84,65 +132,52 @@ export function BudgetsView({ userEmail, budgets }: BudgetsViewProps) {
 
           <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {budgets.length === 0 ? (
-              <EmptyState message="Aún no tienes categorías." className="sm:col-span-2" />
+              <EmptyState message="Aún no tienes presupuestos." className="sm:col-span-2" />
             ) : (
               budgets.map((budget) => {
-                const hasLimit = budget.monthly_limit > 0;
-                const progress = hasLimit ? Math.min(100, (budget.spent / budget.monthly_limit) * 100) : 0;
-                const isWarning = progress >= 80 && progress < 100;
-                const isDanger = progress >= 100;
-                
-                const barColor = isDanger ? "bg-red-500" : isWarning ? "bg-amber-500" : "bg-blue-500";
-                const textColor = isDanger ? "text-red-600" : isWarning ? "text-amber-600" : "text-blue-600";
-                const isSelected = selectedCategories.has(budget.id);
+                const isSelected = selectedBudgets.has(budget.id);
 
                 return (
-                  <Card key={budget.id} className={`relative overflow-hidden transition-all ${isDeleteMode && isSelected ? 'ring-2 ring-red-500' : ''}`}>
+                  <div key={budget.id} className="relative">
                     {isDeleteMode && (
-                      <div className="absolute inset-0 z-20 cursor-pointer bg-transparent" onClick={() => {
-                        const newSet = new Set(selectedCategories);
+                      <div className="absolute inset-0 z-20 cursor-pointer rounded-2xl bg-transparent" onClick={() => {
+                        const newSet = new Set(selectedBudgets);
                         if (newSet.has(budget.id)) newSet.delete(budget.id);
                         else newSet.add(budget.id);
-                        setSelectedCategories(newSet);
+                        setSelectedBudgets(newSet);
                       }}>
                         <div className="absolute right-4 top-4">
-                          <div className={`flex size-6 items-center justify-center rounded-md border-2 transition-colors ${isSelected ? "border-red-500 bg-red-500 text-white" : "border-slate-300 bg-white"}`}>
-                            {isSelected && <Icon icon="ph:check-bold" className="size-4" />}
-                          </div>
+                          <SelectionIndicator isSelected={isSelected} />
                         </div>
                       </div>
                     )}
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base truncate pr-6">{budget.name}</CardTitle>
-                      {hasLimit ? (
-                        <div className="flex items-baseline gap-1 mt-1">
-                          <span className={`text-xl font-bold tabular-nums tracking-tight ${textColor}`}>{formatMoney(budget.spent)}</span>
-                          <span className="text-sm font-medium text-slate-500 tabular-nums">/ {formatMoney(budget.monthly_limit)}</span>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col mt-1">
-                          <span className="text-xs font-medium uppercase tracking-wider text-slate-400 mb-1">Gastado este mes</span>
-                          <span className="text-xl font-bold tabular-nums tracking-tight text-slate-700">{formatMoney(budget.spent)}</span>
-                        </div>
-                      )}
-                    </CardHeader>
-                    {hasLimit && (
-                      <CardContent>
-                        <div className="mt-2 space-y-1.5">
-                          <div className="flex justify-between text-xs font-medium">
-                            <span className={textColor}>{isDanger ? "Límite excedido" : isWarning ? "Cerca del límite" : "Dentro del límite"}</span>
-                            <span className={`tabular-nums ${textColor}`}>{progress.toFixed(1)}%</span>
-                          </div>
-                          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100"><div className={`h-full rounded-full transition-all duration-700 ${barColor}`} style={{ width: `${progress}%` }} /></div>
-                        </div>
-                      </CardContent>
-                    )}
-                  </Card>
+                    <div className={isDeleteMode && isSelected ? 'ring-2 ring-red-500 rounded-2xl overflow-hidden transition-all' : 'transition-all'}>
+                      <BudgetProgressCard 
+                        budget={budget} 
+                        currency={budget.currency || currencyOptions[0]} 
+                        onEdit={() => { 
+                          setEditingBudget(budget); 
+                          setIsDeleteMode(false); 
+                          window.scrollTo({ top: 0, behavior: 'smooth' }); 
+                        }} 
+                      />
+                    </div>
+                  </div>
                 );
               })
             )}
           </div>
         </div>
+
+        {/* Gráfica movida abajo en un plegable para mejorar enfoque del usuario */}
+        {budgets.filter(b => b.monthly_limit > 0).length > 0 && (
+          <div className="mt-6 sm:mt-8">
+            <Collapsible title="Análisis de Presupuestos" defaultOpen={false} className="w-full">
+              <p className="text-sm text-muted-foreground mb-3">Haz clic para ver el análisis Gastado vs Límite. Se muestra en formato compacto para no robar atención al flujo principal.</p>
+              <BudgetOverviewChart budgets={budgets} currency={currencyOptions.includes("EUR") ? "EUR" : currencyOptions[0]} compact />
+            </Collapsible>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

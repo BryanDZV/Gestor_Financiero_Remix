@@ -1,10 +1,18 @@
 // app/routes/dashboard.tsx
 import { data, redirect, useLoaderData } from "react-router";
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
+import type { LoaderFunctionArgs, ActionFunctionArgs, MetaFunction } from "react-router";
 import { getSupabase } from "~/utils/supabase.server";
 import { DashboardView } from "~/features/dashboard/components/dashboard-view";
 import { mapRawWallets } from "~/utils/wallets.server";
-import type { WalletViewModel } from "~/types/models";
+import { PrivacyProvider } from "~/hooks/use-privacy";
+import type { DashboardWallet, DashboardTransaction } from "~/types";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Resumen General | Finanzas Pro" },
+    { name: "description", content: "Visualiza tu patrimonio neto, liquidez y resumen de gastos diarios en tiempo real." },
+  ];
+};
 
 // (Loader y Action se mantienen exactamente igual, la seguridad no cambia)
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -14,14 +22,34 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (error || !user) throw redirect("/login", { headers });
 
   const [walletsResponse, transactionsResponse] = await Promise.all([
-    supabase.from('wallets').select("*, transactions!transactions_wallet_id_fkey(amount, type)").order('created_at', { ascending: true }),
-    supabase.from('transactions').select('*, wallets(name, currency)').order('date', { ascending: false }).limit(10)
+    supabase.from('wallets').select("*, transactions!transactions_wallet_id_fkey(amount, type)").eq('user_id', user.id).order('created_at', { ascending: true }),
+    supabase.from('transactions').select('id, concept, amount, type, date, wallets!transactions_wallet_id_fkey(name, currency)').eq('user_id', user.id).order('date', { ascending: false }).limit(10)
   ]);
 
-  const wallets: WalletViewModel[] = mapRawWallets(walletsResponse.data);
+  const rawWallets = walletsResponse.data || [];
+  const wallets: DashboardWallet[] = mapRawWallets(rawWallets).map((w: any) => ({
+    id: w.id || "",
+    name: w.name,
+    type: w.type || "account",
+    initial_balance: Number(w.initial_balance || 0),
+    current_balance: Number(w.current_balance || 0),
+    is_liability: w.is_liability,
+    currency: w.currency
+  }));
+
+  // Mapeo seguro: transforma el resultado de Supabase (que retorna la relación wallets como un array) a nuestro modelo esperado
+  const rawTransactions = transactionsResponse.data || [];
+  const transactions: DashboardTransaction[] = rawTransactions.map((tx: any) => ({
+    id: tx.id,
+    concept: tx.concept,
+    amount: tx.amount,
+    type: tx.type,
+    date: tx.date,
+    wallets: Array.isArray(tx.wallets) ? tx.wallets[0] : tx.wallets
+  }));
 
   return data(
-    { user, wallets, transactions: transactionsResponse.data || [] },
+    { user, wallets, transactions },
     { headers }
   );
 }
@@ -35,5 +63,9 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function DashboardRoute() {
   const { user, wallets, transactions } = useLoaderData<typeof loader>();
 
-  return <DashboardView userEmail={user.email || ""} wallets={wallets} transactions={transactions} />;
+  return (
+    <PrivacyProvider namespace="dashboard">
+      <DashboardView userEmail={user.email || ""} wallets={wallets} transactions={transactions} />
+    </PrivacyProvider>
+  );
 }

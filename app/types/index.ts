@@ -7,8 +7,9 @@ import type { ReactNode } from "react";
 export type WalletViewModel = {
   id?: string;
   name: string;
+  type?: string;
   is_liability: boolean;
-  target_amount: number;
+  target_amount?: number;
   initial_balance: number;
   currency?: string;
   share_divisor?: number;
@@ -22,12 +23,14 @@ export type TransactionViewModel = {
   type: "income" | "expense" | "transfer";
   date: string;
   category_id?: string | null;
+  budget_id?: string | null;
 };
 
 export type CycleViewModel = {
   id: string;
   name: string;
   is_closed: boolean;
+  start_date?: string;
   transactions?: TransactionViewModel[];
 };
 
@@ -35,6 +38,7 @@ export type CycleHistoryItem = {
   id: string;
   name: string;
   is_closed: boolean;
+  start_date?: string;
   transactions?: {
     id: string;
     concept: string;
@@ -42,6 +46,7 @@ export type CycleHistoryItem = {
     type: "income" | "expense" | "transfer";
     date?: string;
     category_id?: string | null;
+    budget_id?: string | null;
   }[];
 };
 
@@ -54,6 +59,7 @@ export type AccountsWallet = {
   current_balance: number;
   currency?: string;
   share_divisor?: number;
+  target_amount?: number;
 };
 
 export type DashboardWallet = {
@@ -80,6 +86,7 @@ export type Budget = {
   name: string;
   monthly_limit: number;
   spent: number;
+  currency?: string;
 };
 
 export type Subscription = {
@@ -93,6 +100,45 @@ export type Subscription = {
   start_date?: string;
 };
 
+export type AccountActionIntent =
+  | "add_transaction"
+  | "transfer_transaction"
+  | "split_transaction"
+  | "edit_transaction"
+  | "delete_transactions"
+  | "import_file"
+  | "create_cycle"
+  | "close_cycle"
+  | "open_cycle"
+  | "delete_cycle"
+  | "delete_cycles";
+
+export interface AccountActionData {
+  success?: boolean;
+  error?: string;
+  warning?: string;
+  intent?: AccountActionIntent;
+  count?: number;
+  message?: string;
+}
+
+export type AlertSeverity = "success" | "warning" | "error" | "info";
+
+export interface AccountFeedbackEvent {
+  severity: AlertSeverity;
+  message: string;
+  intent?: AccountActionIntent;
+}
+
+export interface AlertCenterItem {
+  id: string;
+  severity: AlertSeverity;
+  message: string;
+  intent?: AccountActionIntent;
+  createdAt: string;
+  read: boolean;
+}
+
 // ==========================================
 // PROPS DE COMPONENTES DE FEATURES
 // ==========================================
@@ -102,9 +148,11 @@ export interface AccountDetailViewProps {
   wallet: WalletViewModel;
   cycles: CycleViewModel[];
   categories: { id: string; name: string }[];
-  otherWallets: { id: string; name: string }[];
-  actionData?: any;
+  otherWallets: { id: string; name: string; currency?: string }[];
+  rates?: Record<string, number>;
+  actionData?: AccountActionData;
   actionError?: string;
+  budgets?: { id: string; name: string }[];
   isSubmitting: boolean;
 }
 
@@ -113,7 +161,17 @@ export interface CycleManagerProps {
   isSubmitting: boolean;
   shareDivisor?: number;
   categories?: { id: string; name: string }[];
-  otherWallets: { id: string; name: string }[];
+  otherWallets: { id: string; name: string; currency?: string }[];
+  budgets?: { id: string; name: string }[];
+  rates?: Record<string, number>;
+  currentCurrency?: string;
+}
+
+export interface CycleHistoryProps {
+  cycles: CycleViewModel[] | CycleHistoryItem[];
+  categories?: { id: string; name: string }[];
+  budgets?: { id: string; name: string }[];
+  currency?: string;
 }
 
 export interface AccountsViewProps {
@@ -124,6 +182,12 @@ export interface AccountsViewProps {
 export interface BudgetsViewProps {
   userEmail: string;
   budgets: Budget[];
+  currencyOptions?: string[];
+}
+
+export interface CategoriesViewProps {
+  userEmail: string;
+  categories: { id: string; name: string; icon?: string }[];
 }
 
 export interface SubscriptionsViewProps {
@@ -140,12 +204,13 @@ export interface DashboardViewProps {
 
 export interface DebtPlannerViewProps {
   userEmail: string;
+  currencyOptions?: string[];
 }
 
 export interface AccountHeaderProps {
   name: string;
   isLiability: boolean;
-  targetAmount: number;
+  targetAmount?: number;
   currentBalance: number;
   currency?: string;
 }
@@ -157,6 +222,18 @@ export interface WalletCardProps {
   initialBalance?: number;
   isLiability?: boolean;
   currency?: string;
+}
+
+export interface BudgetOverviewChartProps {
+  budgets: Budget[];
+  currency?: string;
+  compact?: boolean;
+}
+
+export interface BudgetProgressCardProps {
+  budget: Budget;
+  currency?: string;
+  onEdit?: () => void;
 }
 
 // ==========================================
@@ -203,4 +280,24 @@ export interface EmptyStateProps {
 export interface DashboardLayoutProps {
   userEmail: string;
   children: ReactNode;
+}
+
+export interface SelectionIndicatorProps {
+  isSelected: boolean;
+  className?: string;
+  iconClassName?: string;
+}
+
+// ==========================================
+// UI ATOMS
+// ==========================================
+export interface SegmentedControlOption<T> {
+  label: string;
+  value: T;
+}
+export interface SegmentedControlProps<T> {
+  options: SegmentedControlOption<T>[];
+  value: T;
+  onChange: (value: T) => void;
+  className?: string;
 }

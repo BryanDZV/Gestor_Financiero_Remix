@@ -7,8 +7,10 @@ export default [
   route("dashboard", "routes/dashboard.tsx"), 
   route("dashboard/cuentas", "routes/accounts.tsx"), 
   route("dashboard/cuentas/:id", "routes/account-detail.tsx"), // El segmento dinámico ':id'
+  route("dashboard/categorias", "routes/categories.tsx"),
   route("dashboard/presupuestos", "routes/budgets.tsx"),
   route("dashboard/monedas", "routes/currency.tsx"),
   route("dashboard/suscripciones", "routes/subscriptions.tsx"),
   route("dashboard/planificador", "routes/debt-planner.tsx"),
+  route("dashboard/analytics", "routes/analytics.tsx"),
 ] satisfies RouteConfig;

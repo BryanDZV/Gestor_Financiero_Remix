@@ -20,7 +20,7 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
   },
 ];
 
@@ -32,8 +32,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark')
+              } else {
+                document.documentElement.classList.remove('dark')
+              }
+            `,
+          }}
+        />
       </head>
-      <body>
+      <body className="bg-background text-foreground antialiased transition-colors">
         {children}
         <ScrollRestoration />
         <Scripts />

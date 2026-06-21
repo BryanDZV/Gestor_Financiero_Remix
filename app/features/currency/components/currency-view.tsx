@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRevalidator } from "react-router";
 
 import { DashboardLayout } from "~/components/layout/dashboard-layout";
@@ -21,8 +21,10 @@ interface CurrencyViewProps {
 
 export function CurrencyView({ userEmail, snapshot, options, favorites, error, actionError, fetchedAt }: CurrencyViewProps) {
   const revalidator = useRevalidator();
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     const intervalId = window.setInterval(() => {
       revalidator.revalidate();
     }, 60_000);
@@ -30,12 +32,12 @@ export function CurrencyView({ userEmail, snapshot, options, favorites, error, a
     return () => window.clearInterval(intervalId);
   }, [revalidator]);
 
-  const lastUpdatedLabel = fetchedAt
+  const lastUpdatedLabel = isMounted && fetchedAt
     ? new Intl.DateTimeFormat("es-ES", {
         dateStyle: "medium",
         timeStyle: "short",
       }).format(new Date(fetchedAt))
-    : "hace un momento";
+    : "Cargando...";
 
   return (
     <DashboardLayout userEmail={userEmail}>

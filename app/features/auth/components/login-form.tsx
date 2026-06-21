@@ -1,68 +1,69 @@
-// app/features/auth/components/login-form.tsx
-import { Form } from "react-router";
-import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { Form, Link } from "react-router";
+import { useState } from "react";
+import { TrendingUp } from "lucide-react";
+import { Input } from "~/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "~/components/ui/card";
+import { FormError } from "~/components/ui/form-error";
+import { SubmitButton } from "~/components/ui/submit-button";
+import { ThemeToggle } from "~/components/ui/theme-toggle";
 
-interface LoginFormProps {
-  error?: string;
-  isSubmitting: boolean;
-}
+export function LoginForm({ error, isSubmitting }: { error?: string, isSubmitting: boolean }) {
+  const [isRegister, setIsRegister] = useState(false);
 
-/**
- * Componente de Presentación Puro (Dumb Component).
- * No sabe nada de Supabase ni de bases de datos, solo renderiza la UI.
- */
-export function LoginForm({ error, isSubmitting }: LoginFormProps) {
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 px-4 py-10">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.08),transparent_32%),linear-gradient(180deg,rgba(248,250,252,1),rgba(241,245,249,1))]" />
-
-      <Card className="relative w-full max-w-md border-slate-200/80">
-        <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-3xl tracking-tight">Finanzas Pro</CardTitle>
-          <CardDescription>Acceso seguro al panel de gestión financiera</CardDescription>
+    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-4 py-16 relative">
+      <div className="absolute top-4 left-4 sm:top-6 sm:left-6">
+        <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity" title="Volver a la portada">
+          <div className="flex size-8 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
+            <TrendingUp className="size-5" />
+          </div>
+          <span className="text-xl font-bold tracking-tight text-foreground hidden sm:inline-block">Finanzas Pro</span>
+        </Link>
+      </div>
+      <div className="absolute top-4 right-4"><ThemeToggle /></div>
+      <Card className="border-border shadow-lg">
+        <CardHeader className="text-center space-y-2">
+          <CardTitle className="text-3xl font-bold tracking-tight text-foreground">
+            {isRegister ? "Crear cuenta" : "Bienvenido de nuevo"}
+          </CardTitle>
+          <CardDescription>
+            {isRegister 
+              ? "Ingresa un correo y contraseña para probar Finanzas Pro." 
+              : "Ingresa a tu cuenta para gestionar tus finanzas."}
+          </CardDescription>
         </CardHeader>
-
         <CardContent>
-          <Form method="post" className="space-y-5">
-            {error && (
-              <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                <span className="font-semibold">Error de acceso:</span> {error}
+          <Form method="post" className="space-y-4">
+            <input type="hidden" name="_intent" value={isRegister ? "register" : "login"} />
+            
+            <FormError error={error} />
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Correo electrónico</label>
+              <Input type="email" name="email" placeholder="tu@correo.com" required />
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-foreground">Contraseña</label>
               </div>
-            )}
-
-            <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
-                Email corporativo
-              </label>
-              <input
-                type="email"
-                name="email"
-                placeholder="nombre@empresa.com"
-                required
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-              />
+              <Input type="password" name="password" placeholder="••••••••" required minLength={6} />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
-                Contraseña
-              </label>
-              <input
-                type="password"
-                name="password"
-                placeholder="••••••••"
-                required
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-              />
-            </div>
-
-            <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-xl bg-blue-600 text-white shadow-sm hover:bg-blue-700">
-              {isSubmitting ? "Autenticando..." : "Iniciar sesión"}
-            </Button>
+            <SubmitButton isSubmitting={isSubmitting} className="w-full mt-4">
+              {isRegister ? "Registrarme y probar" : "Iniciar sesión"}
+            </SubmitButton>
           </Form>
         </CardContent>
+        <CardFooter className="flex flex-col gap-4 border-t border-border px-6 py-4">
+          <div className="text-sm text-center text-muted-foreground">
+            {isRegister ? "¿Ya tienes una cuenta? " : "¿No tienes una cuenta? "}
+            <button type="button" onClick={() => setIsRegister(!isRegister)} className="font-semibold text-primary hover:underline">
+              {isRegister ? "Inicia sesión" : "Regístrate gratis"}
+            </button>
+          </div>
+        </CardFooter>
       </Card>
-    </div>
+    </main>
   );
 }
